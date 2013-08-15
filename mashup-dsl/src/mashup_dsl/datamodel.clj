@@ -164,7 +164,12 @@
 
 
 
-
+(defn get-events
+  [xml & tags]
+  ( 
+         let [events (zf/xml-> xml :events :event)
+        fs     (map selector tags)]
+    (map (apply juxt fs) events)))
      (defn testing[]
 (-> data-url 
   parse 
@@ -233,21 +238,17 @@
 
 (def ^:dynamic *map-for-mashups* {:title :content})
 
-(defn events-for-mashup []
-  (let [title "Events mashup" 
-        event-data (xx)]
-    (( (map {} {:title :content} {"Events mashup" (xx)})))))
 
-(defn get-events
-  [xml & tags]
-  ( 
-         let [events (zf/xml-> xml :events :event)
-        fs     (map selector tags)]
-    (map (apply juxt fs) events)))
+
 
 (def tags [:title :start_time [:performers :performer :name] :stop_time])
 
 (defn xx []  (map #(zipmap (map create-tag tags) %) (get-events (parse data-url) :title :start_time [:performers :performer :name] :stop_time)))
+
+(defn events-for-mashup []
+  (let [title "Events mashup" 
+        event-data (xx)]
+     (map {} {:title :content} {"Events mashup" (vec (xx))})))
 
 ;(defn proba[] (map {} {:title :content} {"Events mashup" (xx)}))
 ;this should be macro's output

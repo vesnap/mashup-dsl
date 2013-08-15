@@ -38,7 +38,26 @@
   [data]
   [:div.psdg-right] 
         (content data ))
-  
+(def tmpl-html
+  (html/html-snippet
+   "<div id=\"psdg-top\">
+    <div class=\"psdg-top-cell\" style=\"width:129px; text-align:left; padding- left:24px;\">Summary</div>
+    
+    </div>
+    <div class=\"psdg-right\">10 000</div>"))
+
+;; define a snippet based on some divs in the template
+(html/defsnippet header-cell tmpl-html [[:.psdg-top-cell (html/nth-of-type 1)] ][value]
+  (html/content value))
+
+(html/defsnippet value-cell tmpl-html [[:.psdg-right (html/nth-of-type 1)]] [value]
+  (html/content value))
+
+;; define a template
+(html/deftemplate mshp tmpl-html [content]
+      [:#psdg-top] (html/append (for [c (keys (first content))] (header-cell (name c))))
+      [:.psdg-right] (html/append (for [c (mapcat vals content)] (value-cell c))))
+
 (defn map-of-data [](into [] (map #(into [](vals %)) (:event-data dummy-content))))
 
 (deftemplate t2 "index.html" [title data] 
@@ -73,11 +92,11 @@
    "mbid" :mbid
    "url" :url})
 
-(deftemplate indeks table-template [{:keys  [title event-data]}]
+(deftemplate indeks table-template [{:keys  [title data-content]}]
   [:title] (html/content title)
-  [[:tr (nth-child 2)]] (html/clone-for [event content]
+  [[:tr (nth-child 2)]] (html/clone-for [event data-content]
                         [:td] (fn [td] (assoc td :content [(-> td :attrs :title mapping-templates event)]))));show the page
-
+;ovde bi trebalo map [:td] na contents
 (def routes 
      (app
       [""]  (fn [req] (render-to-response (indeks (data-for-mashup-stack "events mashup" (xx)))))
