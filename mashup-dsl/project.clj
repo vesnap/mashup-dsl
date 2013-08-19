@@ -14,6 +14,11 @@
                 [org.clojure/data.zip "0.1.1"]
                 [org.apache.camel/camel-core "2.11.0"]
                 [org.apache.camel/camel-component "1.4.0"]     
-                [org.clojure/data.xml "0.0.7"]]
-
+                [org.clojure/data.xml "0.0.7"]
+                [localShared/camelclojure "1.0.0-SNAPSHOT"]
+              
+              ]
+    :repositories {"localShared" "file://m2"}
+  :plugins [[lein-localrepo "0.5.2"]]
+  
 )

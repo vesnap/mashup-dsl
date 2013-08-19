@@ -40,11 +40,11 @@
         (content data ))
 (def tmpl-html
   (html/html-snippet
-   "<div id=\"psdg-top\">
+   "<html> <body><div id=\"psdg-top\">
     <div class=\"psdg-top-cell\" style=\"width:129px; text-align:left; padding- left:24px;\">Summary</div>
     
     </div>
-    <div class=\"psdg-right\">10 000</div>"))
+    <div class=\"psdg-right\">10 000</div> </body> </html>"))
 
 ;; define a snippet based on some divs in the template
 (html/defsnippet header-cell tmpl-html [[:.psdg-top-cell (html/nth-of-type 1)] ][value]
@@ -58,48 +58,51 @@
       [:#psdg-top] (html/append (for [c (keys (first content))] (header-cell (name c))))
       [:.psdg-right] (html/append (for [c (mapcat vals content)] (value-cell c))))
 
-(defn map-of-data [](into [] (map #(into [](vals %)) (:event-data dummy-content))))
 
-(deftemplate t2 "index.html" [title data] 
-  [:div.psdg-left]  (substitute (make-a-row title data)))
+;call to my lovely template (mshp (:data-content(data-for-mashup-stack "events" (xx))))
 
+;(defn map-of-data [](into [] (map #(into [](vals %)) (:event-data dummy-content))))
 
-(def table-template (html/html-resource "index2.html"))
-
-(def ^:dynamic *section-sel* {[:title][[:tbody (attr= :title "events")]]})
+;(deftemplate t2 "index.html" [title data] 
+ ; [:div.psdg-left]  (substitute (make-a-row title data)))
 
 
-(html/defsnippet row-snippet table-template [[:tr (attr= :title "event")]]
-  [{:keys [event-name performers date start-time end-time]}]
+;(def table-template (html/html-resource "index2.html"))
 
-  [[:td (attr= :title "event-title")]] (html/content event-name)
-  [[:td (attr= :title "performer")]] (html/content performers)
-  [[:td (attr= :title "date")]] (html/content date)
-  [[:td (attr= :title "start-time")]] (html/content start-time)
-  [[:td (attr= :title "end-time")]] (html/content end-time))
+;(def ^:dynamic *section-sel* {[:title][[:tbody (attr= :title "events")]]})
+
+
+;(html/defsnippet row-snippet table-template [[:tr (attr= :title "event")]]
+ ; [{:keys [event-name performers date start-time end-time]}]
+
+  ;[[:td (attr= :title "event-title")]] (html/content event-name)
+  ;[[:td (attr= :title "performer")]] (html/content performers)
+  ;[[:td (attr= :title "date")]] (html/content date)
+  ;[[:td (attr= :title "start-time")]] (html/content start-time)
+  ;[[:td (attr= :title "end-time")]] (html/content end-time))
 
 ;(deftemplate indeks table-template
  ;[{:keys  [title event-data]}]
 ;[:title] (html/content title)
 ;[:tbody]  (html/content (map #(row-snippet %) (create-map-of-events)
  ;                          )))
-(def mapping-templates
-  {"event-title" :event-name
-   "performer" :performers
-   "date" :date
-   "start-time" :start-time
-   "end-time" :end-time
-   "mbid" :mbid
-   "url" :url})
+;(def mapping-templates
+ ; {"event-title" :event-name
+ ;  "performer" :performers
+ ;  "date" :date
+;   "start-time" :start-time
+  ; "end-time" :end-time
+   ;"mbid" :mbid
+  ; "url" :url})
 
-(deftemplate indeks table-template [{:keys  [title data-content]}]
-  [:title] (html/content title)
-  [[:tr (nth-child 2)]] (html/clone-for [event data-content]
-                        [:td] (fn [td] (assoc td :content [(-> td :attrs :title mapping-templates event)]))));show the page
+;(deftemplate indeks table-template [{:keys  [title data-content]}]
+ ; [:title] (html/content title)
+  ;[[:tr (nth-child 2)]] (html/clone-for [event data-content]
+   ;                     [:td] (fn [td] (assoc td :content [(-> td :attrs :title mapping-templates event)]))));show the page
 ;ovde bi trebalo map [:td] na contents
 (def routes 
      (app
-      [""]  (fn [req] (render-to-response (indeks (data-for-mashup-stack "events mashup" (xx)))))
+      [""]  (fn [req] (render-to-response (mshp (:data-content(data-for-mashup-stack "events mashup" (xx))))))
       ;(fn [req] render-to-response (indeks content-t))
       [&]   page-not-found))
 
