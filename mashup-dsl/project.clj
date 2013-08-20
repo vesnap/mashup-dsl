@@ -15,10 +15,10 @@
                 [org.apache.camel/camel-core "2.11.0"]
                 [org.apache.camel/camel-component "1.4.0"]     
                 [org.clojure/data.xml "0.0.7"]
-                [localShared/camelclojure "1.0.0-SNAPSHOT"]
+                [info.kovanovic/camelclojure "0.0.1-SNAPSHOT"]
               
               ]
-    :repositories {"localShared" "file://m2"}
+    :repositories {"local"  "C:/Users/pvmd/.m2/repository"}
   :plugins [[lein-localrepo "0.5.2"]]
   
 )

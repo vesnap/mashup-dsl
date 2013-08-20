@@ -1,8 +1,10 @@
 (ns mashup-dsl.aggregation
   (:use [clojure.test]
-        [camelclojure.dsl]
+        [mashup-dsl.templating]
+        [src.main.clojure.info.kovanovic.camelclojure.dsl]
+     
 	[mashup-dsl.test-utils]
- [mashup-dsl.templating]))
+ ))
   
 (deftest aggregator-pattern
   (let [start (file-comp "calendar.xml")
