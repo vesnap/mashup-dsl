@@ -7,7 +7,7 @@
     [clojure.data.zip.xml :as zf]
      [clojure.java.io :as io]
     ))
-
+;to do opisati rss i atom feed
 
 (def data-url "http://api.eventful.com/rest/events/search?app_key=4H4Vff4PdrTGp3vV&keywords=music&location=Belgrade&date=Future")
 

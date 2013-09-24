@@ -1,7 +1,7 @@
 (ns mashup-dsl.normalizer
 
   (:use [clojure.test]
-        [info.kovanovic.camelclojure.dsl]
+        [mashup-dsl.camel-dsl]
     [net.cgrand.enlive-html :as en-html]
     ;[datamodel]
 	;[info.kovanovic.camelclojure.test-util]

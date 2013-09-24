@@ -1,12 +1,12 @@
 (ns mashup-dsl.content-enricher
   (:use [clojure.test]
-        [info.kovanovic.camelclojure.dsl]
+        [mashup-dsl.dsl]
         [clojure.set]
 
     ;[net.cgrand.enlive-html :as en-html]
-    [test-utils]
-    [datamodel]
-	;[info.kovanovic.camelclojure.test-util]
+    [mashup-dsl.test-utils]
+    [mashup-dsl.datamodel]
+	;[mashup-dsl.test-util]
 )
 (:import [org.apache.camel.component.mock MockEndpoint]
 	   [org.apache.camel.component.direct DirectEndpoint]

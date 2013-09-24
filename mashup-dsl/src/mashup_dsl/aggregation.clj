@@ -1,7 +1,7 @@
 (ns mashup-dsl.aggregation
   (:use [clojure.test]
         [mashup-dsl.templating]
-        [src.main.clojure.info.kovanovic.camelclojure.dsl]
+        [mashup-dsl.camel-dsl]
      
 	[mashup-dsl.test-utils]
  ))
@@ -10,7 +10,7 @@
   (let [start (file-comp "calendar.xml")
 	end  (mock "mashups")
 	f (fn [[body1 headers1] [body2 headers2]]
-	    (identity [(indeks body1 (body2))
+	    (identity [(mshp body1 (body2))
 		       headers1]))
 
 	r (route (from start)

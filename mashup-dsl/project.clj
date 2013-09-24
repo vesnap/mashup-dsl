@@ -16,7 +16,8 @@
                 [org.apache.camel/camel-component "1.4.0"]     
                 [org.clojure/data.xml "0.0.7"]
                 [info.kovanovic/camelclojure "0.0.1-SNAPSHOT"]
-              
+                [log4j "1.2.12"]
+                [org.clojure/tools.logging "0.2.6"]
               ]
     :repositories {"local"  "C:/Users/pvmd/.m2/repository"}
   :plugins [[lein-localrepo "0.5.2"]]

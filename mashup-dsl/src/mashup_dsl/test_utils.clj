@@ -1,13 +1,13 @@
 (ns mashup-dsl.test-utils
   
   (:use [clojure.test]
-        [info.kovanovic.camelclojure.dsl]
+        [mashup-dsl.camel-dsl]
     [net.cgrand.enlive-html :as en-html]
     ;[datamodel]
 	;[info.kovanovic.camelclojure.test-util]
 )
 (:import [org.apache.camel.component.mock MockEndpoint]
-	   [org.apache.camel.component.direct DirectEndpoint]
+	  ; [org.apache.camel.component.direct DirectEndpoint]
 	   [org.apache.camel ProducerTemplate]
     [org.apache.camel.component.file FileEndpoint]
     [org.apache.camel.component.file FileComponent]))
@@ -19,8 +19,8 @@
 (defn mock [url]
   (MockEndpoint. (str "mock://" url)))
 
-(defn direct [url]
-  (DirectEndpoint. (str "direct://" url)))
+;(defn direct [url]
+ ; (DirectEndpoint. (str "direct://" url)))
 
 (defn- init [context endpoints]
   (if-not (empty? endpoints)
