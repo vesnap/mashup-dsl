@@ -5,7 +5,10 @@
         [ring.middleware.file :only [wrap-file]]
         [ring.middleware.stacktrace :only [wrap-stacktrace]]
         )
-  (:import (java.util.concurrent TimeUnit))
+  (:import (java.util.concurrent TimeUnit)
+  [org.apache.camel.component.mock MockEndpoint]
+	   [org.apache.camel.component.direct DirectEndpoint]
+	   [org.apache.camel ProducerTemplate])
 )
 
 ;;; Utilities

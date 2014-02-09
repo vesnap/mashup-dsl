@@ -46,7 +46,7 @@
   ([m1 m2 & maps]
      (reduce merge-disjoint m1 (cons m2 maps))))
 
-(defn join ;ovaj join radi za 1 red, sad treba da posaljem ceo vektor sa mapama
+(defn dm-join ;ovaj join radi za 1 red, sad treba da posaljem ceo vektor sa mapama
            [m1 m2 key1 key2]
             (when (= (m1 key1) (m2 key2)) (into  m2 m1)))
 ;(join  {"Steve Bug" :title} {"Usce Zero" :title} :title :title)
@@ -170,7 +170,7 @@
          let [events (zf/xml-> xml :events :event)
         fs     (map selector tags)]
     (map (apply juxt fs) events)))
-     (defn testing[]
+     (defn testing2[]
 (-> data-url 
   parse 
  (get-events :title :start_time [:performers :performer :name] :stop_time)

@@ -7,10 +7,11 @@
 	;[info.kovanovic.camelclojure.test-util]
 )
 (:import [org.apache.camel.component.mock MockEndpoint]
-	  ; [org.apache.camel.component.direct DirectEndpoint]
+	   [org.apache.camel.component.direct DirectEndpoint]
 	   [org.apache.camel ProducerTemplate]
     [org.apache.camel.component.file FileEndpoint]
-    [org.apache.camel.component.file FileComponent]))
+    [org.apache.camel.component.file FileComponent]
+    [org.apache.camel.component.direct DirectComponent]))
 
 
 (defn file-comp[file-name]
@@ -19,8 +20,11 @@
 (defn mock [url]
   (MockEndpoint. (str "mock://" url)))
 
-;(defn direct [url]
- ; (DirectEndpoint. (str "direct://" url)))
+(defn directComponent []
+  (DirectComponent. ))
+
+(defn direct [url]
+(DirectEndpoint. url (directComponent)))
 
 (defn- init [context endpoints]
   (if-not (empty? endpoints)
@@ -34,7 +38,7 @@
   (.setHeaderName header-name) endpoint)
 (defn stop-test [camel]
   (stop camel))
-(defn data [url](en-html/select(en-html/xml-resource url) [:calendar]))
+(defn data2 [url](en-html/select(en-html/xml-resource url) [:calendar]))
 (defn get-received-messages [endpoint]
   (map #(.. % getIn getBody) (.getReceivedExchanges endpoint)))
 
@@ -62,3 +66,8 @@
 
 (defn is-message-count [endpoint count]
   (is (= (count-messages endpoint) count)))
+
+
+
+
+

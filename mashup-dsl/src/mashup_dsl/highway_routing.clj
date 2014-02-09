@@ -1,8 +1,17 @@
 (ns mashup-dsl.highway-routing
-(:use [info.kovanovic.camelclojure.dsl])
+(:use [mashup-dsl.camel-dsl])
 (:use [templating]))
 
-;normalizer, content enricher i dynamic router
+;normalizer je kombinacija transformation, 
+;koji je u stvari processor i router
+;content enricher 
+
+
+;;;;;;
+;aggregator je za spajanje vise izvora podataka
+;tu treba aggregationstrategy
+;;;;;;;;;;;;;
+;content enricher je enrich
 
 ;from api-calls to-?, ne mogu da provalim gde da saljem koja komponenta 
 
@@ -64,7 +73,7 @@ start[(create get-data)])
    ; .to("mock:result");gde da ga prebacim
    
    
-   ;za content enricher
+   ;za aggregator
 
 ;new AggregationStrategy() {
 ;public Exchange aggregate(Exchange oldExchange,

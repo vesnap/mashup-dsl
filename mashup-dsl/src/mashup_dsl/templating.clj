@@ -1,4 +1,5 @@
-(ns mashup-dsl.templating (:use [net.cgrand.enlive-html :as html] 
+(ns mashup-dsl.templating 
+  (:use [net.cgrand.enlive-html :as html] 
         [net.cgrand.moustache ]
         [mashup-dsl.utils]
         [mashup-dsl.datamodel :as dm]

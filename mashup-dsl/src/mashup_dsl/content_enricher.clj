@@ -1,37 +1,50 @@
 (ns mashup-dsl.content-enricher
   (:use [clojure.test]
-        [mashup-dsl.dsl]
+        [mashup-dsl.camel-dsl]
         [clojure.set]
 
     ;[net.cgrand.enlive-html :as en-html]
     [mashup-dsl.test-utils]
     [mashup-dsl.datamodel]
-	;[mashup-dsl.test-util]
 )
-(:import [org.apache.camel.component.mock MockEndpoint]
-	   [org.apache.camel.component.direct DirectEndpoint]
-	   [org.apache.camel ProducerTemplate]
-    [org.apache.camel.component.file FileEndpoint]
-    [org.apache.camel.component.file FileComponent])
-)
+   (:import (org.apache.camel Exchange)))
+
+;;
+
+
+(defn enrich [uri aggStrat]
+  (
+    ))
+;(defn- aggregation-strategy [agg-fn]
+ ; (proxy [AggregationStrategy] []
+  ;  (aggregate [old-exchange res-exchange]
+	 ;      (let [[n-body n-headers] ((generate-aggregator agg-fn) old-exchange res-exchange)]
+		; (.. new-exchange getIn (setBody n-body))
+		 ;(.. new-exchange getIn (setHeaders n-headers))
+		 ;new-exchange))))
+
 
 (defn enrich[ex message url &key-data]
 ;(message is map with starting data, data is list of attributes for data that we want to be added)
 ((if not (nil? ex)
-(let [mess (.. message getIn getBody)]
+(let [mess (.getIn (.getBody ex))]
 merge-with union mess (data url))
 )))
 
 
 (deftest content-enricher-pattern
-  (let [start (file-comp "d:/calendar.xml")
+  (let [
+        process-body (fn [proc-fn]
+ (fn [[body headers]]
+ [(proc-fn body) headers]))
+  start (direct data-url)
 	end   (mock "end")
- url "http://api.eventful.com/rest/events/search?app_key=4H4Vff4PdrTGp3vV&keywords=music&location=Belgrade&date=Future"
- enriching-with-data (enrich start url start (data url))
-	camel (create (route (from start)
-enriching-with-data
-			     (to end)))]
-    (start-test camel start enriching-with-data end)
+  enriching-with-data (map-tags-contents data-url :event)
+  p1-route (route (from start)
+ (process (process-body enriching-with-data))
+ (to end))
+  camel (create p1-route)]
+    (start-test camel)
     (stop-test camel)))
 
 
