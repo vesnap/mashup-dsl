@@ -22,17 +22,16 @@
 ;normalizer is combination of router and transformer
 (deftest normalizer-pattern
   
-  (let [start data-url
-       end   (mock "end")			
+  (let [start (direct data-url)
+       end   (mock "normalized")			
     xml-processing 
-				  (processor (map-tags-contents start :events :event :description))
-				  
-       routing (route (from start)
-               (router  (xml-processing))
-          (to end))
-
-	camel (create (routing
-                 xml-processing))]
+				  (route (from start)
+            ( process #(map-tags-contents data-url :events :event :title))
+            (to end))
+	camel (create 
+             xml-processing
+         
+                 )]
     (start-test camel start end)
  
     (is-message-count end 1)

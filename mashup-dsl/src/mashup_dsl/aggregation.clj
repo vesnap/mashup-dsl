@@ -22,14 +22,13 @@
     ;  (is (= (count messages) 2)))
    ; (stop-test camel)))
 
-
-  
+;mash operator
+  ;html template + data
 (deftest aggregator-pattern
-  (let [start (direct )
+  (let [start (direct data-url)
 	end  (mock "end")
-	f (fn [[body1 headers1] [body2 headers2]]
-	    (identity [(str body1 body2)
-		       headers1]))
+	f (fn []
+	    (mshp (:data-content(data-for-mashup-stack "events" (xx)))))
 
 	r (route (from start)
 		 (aggregator f "type" :count 2)

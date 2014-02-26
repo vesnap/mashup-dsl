@@ -24,27 +24,28 @@
 		 ;new-exchange))))
 
 
-(defn enrich[ex message url &key-data]
+;(defn enrich[ex message url &key-data]
 ;(message is map with starting data, data is list of attributes for data that we want to be added)
-((if not (nil? ex)
-(let [mess (.getIn (.getBody ex))]
-merge-with union mess (data url))
-)))
+;((if not (nil? message)
+;(
+;merge-with union message (data url)
+ ;ex .getOut() .setBody(merge-with union message (data url)))
+;)))
 
-
+;enrich(excgange, podaci)
+;newmessage=message.replace(poslednji red, sa novimpodacima)
+;
 (deftest content-enricher-pattern
-  (let [
-        process-body (fn [proc-fn]
- (fn [[body headers]]
- [(proc-fn body) headers]))
+  (let [ 
   start (direct data-url)
-	end   (mock "end")
-  enriching-with-data (map-tags-contents data-url :event)
-  p1-route (route (from start)
- (process (process-body enriching-with-data))
- (to end))
-  camel (create p1-route)]
-    (start-test camel)
-    (stop-test camel)))
+ mashed (mock "mash")
 
+  camel (create (route (from start)
+                       (process (map-tags-contents data-url :events))
+                       (to mashed)))]
+    (start-test camel start mashed)
+    (send-text-message camel start "")
+    (stop-test camel)
+    ))
 
+;merge operator
