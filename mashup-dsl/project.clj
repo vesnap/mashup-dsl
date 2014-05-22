@@ -18,6 +18,7 @@
                 [info.kovanovic/camelclojure "0.0.1-SNAPSHOT"]
                 [log4j "1.2.12"]
                 [org.clojure/tools.logging "0.2.6"]
+                [com.github.kyleburton/clj-xpath "1.4.3"]
               ]
     :repositories {"local"  "C:/Users/pvmd/.m2/repository"}
   :plugins [[lein-localrepo "0.5.2"]]
