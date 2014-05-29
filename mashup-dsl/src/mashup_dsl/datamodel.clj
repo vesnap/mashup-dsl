@@ -1,11 +1,15 @@
 (ns mashup-dsl.datamodel
   (:use
-    [net.cgrand.enlive-html :as en-html])
+   ; [net.cgrand.enlive-html :as en-html]
+     [clj-xpath.core]
+   [clojure.string :as string]
+     )
   (:require
     [clojure.zip :as z] 
     [clojure.xml :as xml ]
     [clojure.data.zip.xml :as zf]
      [clojure.java.io :as io]
+     [clojure.pprint :as pp]
     ))
 ;
 ;
@@ -136,7 +140,7 @@
 
 (defn create-map [seq](map conj titles descriptions ));macro out of this
 
-(defn data [url] (en-html/xml-resource url)) 
+;(defn data [url] (en-html/xml-resource url)) 
 
 (defn add-content [url coll]
   (map :contents (z/xml-zip (xml/parse url)) coll))
@@ -279,3 +283,97 @@
  
 ;_exchange.getOut().setBody(createEarthquake(title.substring(7), date, title.substring(2,5), latitude, longitude, depth, area))
 
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;
+;;;using clj-xpath;;;;
+;;;and it works perfectly;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+
+(def events-xml
+     (memoize (fn [] (slurp data-url))))
+
+
+
+(defn get-tags [maintag] ($x:text  maintag 
+                            (xmldoc)));main tag je "/events/event/title"
+
+(defn all-tags [doc]
+  (map
+   ;; turn the keywords into strings
+   name
+   (seq
+    ;; reduce the stream of nodes into a distinct list
+    (reduce
+     (fn [acc node]
+       (conj acc (:tag node)))
+     #{}
+     ;; tree-seq flattens the document into a one-dimensional stream
+     ;; of nodes:
+     (tree-seq (fn [n] (:node n))
+               (fn [n] ($x "./*" n))
+               (first ($x "./*" doc)))))))
+
+
+(defn visit-nodes
+  ([path nodes f]
+     (vec
+      (mapcat
+       #(vec
+         (cons
+          ;; invoke the callback on the each of the nodes
+          (f (conj path (:tag %1)) %1)
+          ;; visit each of the children of this node
+          (visit-nodes
+           (conj path (:tag %1))
+           ($x "./*" %1) f)))
+       nodes))))
+
+
+(comment (visit-nodes []
+               ($x "./*" (xmldoc))
+               (fn [p n]
+                 (printf "%s tag:%s\n"
+                         (apply str (interpose "/" (map name p)))
+                         (name (:tag n))))))
+
+(defn all-paths [doc]
+  (map
+   #(str "/" (string/join "/" (map name %1)))
+   (first
+    (reduce
+     (fn [[acc set] p]
+       (if (contains? set p)
+         [acc set]
+         [(conj acc p) (conj set p)]))
+     [[] #{}]
+     (visit-nodes []
+                  ($x "./*" doc)
+                  (fn [p n]
+                    p))))))
+
+(map
+             (fn [item]
+               {:title ($x:text "./title" item)
+                :url  ($x:text "./url" item)})
+             (take 5
+                   ($x "/search/events/event" (xmldoc))))
+
+
+(def item (take 5 ($x "/search/events/event" (xmldoc))))
+
+(def xmldoc
+     (memoize (fn [] (xml->doc (events-xml)))))
+(defn create-xpath [tag] (str "./" tag))
+
+(def tags ["title" "url"])
+
+(defn parse2 [item]
+        (doseq [tag tags](into {} (keyword tag) ($x:text (create-xpath tag) item)) ))
+
+(def ks [:url :title])
+
+(defn parse[]
+(map #(zipmap ks %) (map (juxt (tag-fn "url") (tag-fn "title")) (take 2 ($x "//event" (xmldoc))))))
