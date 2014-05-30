@@ -64,11 +64,11 @@
      (reduce merge-disjoint m1 (cons m2 maps))))
 
 
-(defn dm-join ;ovaj join radi za 1 red, sad treba da posaljem ceo vektor sa mapama
+(defn row-join ;ovaj join radi za 1 red, sad treba da posaljem ceo vektor sa mapama
            [m1 m2 key1 key2]
             (when (= (m1 key1) (m2 key2)) (into  m2 m1)))
 
-
+;;;;ne znam za ovo (clojure.set/join test-left test-right {:name :owner})
 ;(join  {"Steve Bug" :title} {"Usce Zero" :title} :title :title)
 ;{"Usce Zero" :title, "Steve Bug" :title}
 ;=> (join  {"Steve Bug" :title} {"Usce Zero" :name} :title :name)
@@ -99,7 +99,8 @@
                 kvs))))
   
 ;za spajanje redova
-  ;(def data (vector (into  '[] (map-tags-contents data-url :events :event :title)) (into  '[] (map-tags-contents data-url :events :event :venue_name))))
+  ;(def data (vector (into  '[] (map-tags-contents data-url :events :event :title))
+;(into  '[] (map-tags-contents data-url :events :event :venue_name))))
 ;ovo iznad ne radi dobro
 ;;(def merged-data (map (partial apply merge) 
  ;       (apply map vector data)))
@@ -377,3 +378,13 @@
 
 (defn parse[]
 (map #(zipmap ks %) (map (juxt (tag-fn "url") (tag-fn "title")) (take 2 ($x "//event" (xmldoc))))))
+
+
+
+;;;;;merging;;;;
+;;;;;using sets;;;;
+(def item1 '({:title "title 1", :url "url1"} {:title "title 2", :url "url2"}))
+(def item2 '({:name "title 1", :something "sss"} {:name "title 2", :something "ssss2222"}))
+(clojure.set/join (vec item1) (vec item2) {:name :title})
+;;;and then everything back to vector
+((vec '#{:something "sss" :name "name1"}))
