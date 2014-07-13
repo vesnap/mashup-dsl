@@ -26,7 +26,7 @@
        end   (mock "normalized")			
     xml-processing 
 				  (route (from start)
-            ( process #(map-tags-contents data-url :events :event :title))
+            ( process #(msh-contents data-url ))
             (to end))
 	camel (create 
              xml-processing

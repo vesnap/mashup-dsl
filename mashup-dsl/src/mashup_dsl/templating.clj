@@ -4,7 +4,7 @@
         [mashup-dsl.utils]
         [mashup-dsl.datamodel :as dm]
   [clojure.pprint]))
- 
+  
 
 (def dummy-content
  {:title "Events Mashup"
@@ -22,8 +22,8 @@
 
 ;define snippets for "cell" and "row"
 
-(def div-wrapper  (wrap :div {:class "psdg-right"}) )
-(def title-wrapper (wrap :div {:class "psdg-left"}))
+(def div-wrapper  (html/wrap :div {:class "psdg-right"}) )
+(def title-wrapper (html/wrap :div {:class "psdg-left"}))
 
 (defn make-div [elements ] (map div-wrapper elements))
 
@@ -31,36 +31,38 @@
   (merge [ (title-wrapper title) (make-div values)]))
 
 
-(def template-div (html-resource "index.html"))
+(defn template-div[] (html/html-resource "index.html"))
 
-(def cell-selector (select template-div  [:div.psdg-right]))
+(def cell-selector (html/select (template-div)  [:div.psdg-right]))
  
-(defsnippet cell-model "index.html" cell-selector
+(html/defsnippet cell-model "index.html" cell-selector
   [data]
   [:div.psdg-right] 
-        (content data ))
-(def tmpl-html
-  (html/html-snippet
-   "<html> <body><div id=\"psdg-top\">
-    <div class=\"psdg-top-cell\" style=\"width:129px; text-align:left; padding- left:24px;\">Summary</div>
-    
-    </div>
-    <div class=\"psdg-right\">10 000</div> </body> </html>"))
+        (html/content data ))
+
+;(defn tmpl-html []
+ ; (html/html-resource
+  ; "<html> <body><div id=\"psdg-top\">
+   ; <div class=\"psdg-top-cell\" style=\"width:129px; text-align:left; padding- left:24px;\">Summary</div>
+    ;
+    ;</div>
+    ;<div class=\"psdg-right\">10 000</div> </body> </html>"))
 
 ;; define a snippet based on some divs in the template
-(html/defsnippet header-cell tmpl-html [[:.psdg-top-cell (html/nth-of-type 1)] ][value]
+(html/defsnippet header-cell (template-div) [:div.Heading :div.Cell][value]
   (html/content value))
 
-(html/defsnippet value-cell tmpl-html [[:.psdg-right (html/nth-of-type 1)]] [value]
+(html/defsnippet value-cell (template-div) [:div.Row :div.Cell] [value]
   (html/content value))
 
 ;; define a template
-(html/deftemplate mshp tmpl-html [content]
-      [:#psdg-top] (html/append (for [c (keys (first content))] (header-cell (name c))))
-      [:.psdg-right] (html/append (for [c (mapcat vals content)] (value-cell c))))
+(html/deftemplate mshp "index.html" [cont]
+      [:div.Heading] (html/content (for [c (keys (first (:data-content cont)))] (header-cell (name c))));ovo je ok
+      [:div.Row] (html/content (map #(value-cell %) (for[e (:data-content (cont))] (vals e)))));ovo celo daje lazy seq
 
 
 ;call to my lovely template (mshp (:data-content(data-for-mashup-stack "events" (xx))))
+;ovaj xx nesto nece tako da ovo (mshp (:event-data dummy-content)) radi
 
 ;(defn map-of-data [](into [] (map #(into [](vals %)) (:event-data dummy-content))))
 
@@ -73,14 +75,6 @@
 ;(def ^:dynamic *section-sel* {[:title][[:tbody (attr= :title "events")]]})
 
 
-;(html/defsnippet row-snippet table-template [[:tr (attr= :title "event")]]
- ; [{:keys [event-name performers date start-time end-time]}]
-
-  ;[[:td (attr= :title "event-title")]] (html/content event-name)
-  ;[[:td (attr= :title "performer")]] (html/content performers)
-  ;[[:td (attr= :title "date")]] (html/content date)
-  ;[[:td (attr= :title "start-time")]] (html/content start-time)
-  ;[[:td (attr= :title "end-time")]] (html/content end-time))
 
 ;(deftemplate indeks table-template
  ;[{:keys  [title event-data]}]
@@ -103,7 +97,7 @@
 ;ovde bi trebalo map [:td] na contents
 (def routes 
      (app
-      [""]  (fn [req] (render-to-response (mshp (:data-content(data-for-mashup-stack "events mashup" (xx))))))
+      [""]  (fn [req] (render-to-response (mshp (:data-content(data-for-mashup-stack "events mashup" (msh-contents))))))
       ;(fn [req] render-to-response (indeks content-t))
       [&]   page-not-found))
 

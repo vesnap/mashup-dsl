@@ -2,7 +2,7 @@
   (:use
    ; [net.cgrand.enlive-html :as en-html]
      [clj-xpath.core]
-   [clojure.string :as string]
+  ; [clojure.string :as string]
      )
   (:require
     [clojure.zip :as z] 
@@ -10,6 +10,7 @@
     [clojure.data.zip.xml :as zf]
      [clojure.java.io :as io]
      [clojure.pprint :as pp]
+     [clojure.string :as s]
     ))
 ;
 ;
@@ -17,7 +18,8 @@
 ;
 ;
 
-(def data-url "http://api.eventful.com/rest/events/search?app_key=4H4Vff4PdrTGp3vV&keywords=music&location=Belgrade&date=Future")
+(def data-url
+  "http://api.eventful.com/rest/events/search?app_key=4H4Vff4PdrTGp3vV&keywords=music&location=Belgrade&date=Future")
 
 
 (defn parsing [url](xml/parse url))
@@ -163,7 +165,8 @@
 (def apis (defentity api-name api-url api-format))
 
 ;(defrecord event [event-name performers start-time stop-time])
-(def events-url "http://api.eventful.com/rest/events/search?app_key=4H4Vff4PdrTGp3vV&keywords=music&location=Belgrade&date=Future")
+(def events-url
+  "http://api.eventful.com/rest/events/search?app_key=4H4Vff4PdrTGp3vV&keywords=music&location=Belgrade&date=Future")
 
 
 ;for mapping data from the apis to the model
@@ -266,7 +269,9 @@
 
 (def tags [:title :start_time [:performers :performer :name] :stop_time])
 
-(defn xx []  (map #(zipmap (map create-tag tags) %) (get-events (parsing data-url) :title :start_time [:performers :performer :name] :stop_time)))
+(defn xx []  
+  (map #(zipmap (map create-tag tags) %) 
+       (get-events (parsing data-url) :title :start_time [:performers :performer :name] :stop_time)))
 
 (defn events-for-mashup []
   (let [title "Events mashup" 
@@ -279,7 +284,7 @@
         `(zipmap [:title :content] [~mashup-name '(~func)]))
 ;nearly there (map {} {:title :content} {"Events mashup" (xx)})
 
-(defn data-for-mashup-stack [mashup-name val] (zipmap [:title :data-content] [mashup-name (vec val)]));this is it
+(defn data-for-mashup-stack [mashup-name val] (zipmap [ :data-content :title] [ (vec val) mashup-name]));this is it
 
  
 ;_exchange.getOut().setBody(createEarthquake(title.substring(7), date, title.substring(2,5), latitude, longitude, depth, area))
@@ -297,6 +302,8 @@
      (memoize (fn [] (slurp data-url))))
 
 
+(def xmldoc
+     (memoize (fn [] (xml->doc (events-xml)))))
 
 (defn get-tags [maintag] ($x:text  maintag 
                             (xmldoc)));main tag je "/events/event/title"
@@ -333,16 +340,17 @@
        nodes))))
 
 
-(comment (visit-nodes []
+(defn cc [](comment (visit-nodes []
                ($x "./*" (xmldoc))
                (fn [p n]
                  (printf "%s tag:%s\n"
                          (apply str (interpose "/" (map name p)))
-                         (name (:tag n))))))
+                         (name (:tag n)))))))
+
 
 (defn all-paths [doc]
   (map
-   #(str "/" (string/join "/" (map name %1)))
+   #(str "/" (s/join "/" (map name %1)))
    (first
     (reduce
      (fn [[acc set] p]
@@ -354,19 +362,18 @@
                   ($x "./*" doc)
                   (fn [p n]
                     p))))))
-
-(map
+;ovo radi odlicno
+(defn mm [](map
              (fn [item]
                {:title ($x:text "./title" item)
                 :url  ($x:text "./url" item)})
              (take 5
-                   ($x "/search/events/event" (xmldoc))))
+                   ($x "/search/events/event" (xmldoc)))))
 
 
 (def item (take 5 ($x "/search/events/event" (xmldoc))))
 
-(def xmldoc
-     (memoize (fn [] (xml->doc (events-xml)))))
+
 (defn create-xpath [tag] (str "./" tag))
 
 (def tags ["title" "url"])
@@ -376,15 +383,25 @@
 
 (def ks [:url :title])
 
-(defn parse[]
-(map #(zipmap ks %) (map (juxt (tag-fn "url") (tag-fn "title")) (take 2 ($x "//event" (xmldoc))))))
+
+(defn msh-contents [](zipmap [   :data-content :title] [ (vec (map
+                         (fn [item]
+                           {:title ($x:text "./title" item)
+                            :url  ($x:text "./url" item)})
+                         (take 5
+                               ($x "/search/events/event" (xmldoc))))) "Events mashup"]))
 
 
+;(defn parse[]
+;(map #(zipmap ks %) (map (juxt (create-xpath "url") (create-xpath "title")) (take 2 ($x "//event" (xmldoc))))))
+
+  
+  ;primer sa item1 i item2
+;(clojure.set/join (vec item1) (vec item2) {:name :title})
+;;;and then everything back to vector
+;((vec '#{:something "sss" :name "name1"}))
 
 ;;;;;merging;;;;
 ;;;;;using sets;;;;
 (def item1 '({:title "title 1", :url "url1"} {:title "title 2", :url "url2"}))
 (def item2 '({:name "title 1", :something "sss"} {:name "title 2", :something "ssss2222"}))
-(clojure.set/join (vec item1) (vec item2) {:name :title})
-;;;and then everything back to vector
-((vec '#{:something "sss" :name "name1"}))
