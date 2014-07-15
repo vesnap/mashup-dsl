@@ -26,7 +26,7 @@
        end   (mock "normalized")			
     xml-processing 
 				  (route (from start)
-            ( process #(msh-contents data-url ))
+            ( process #(msh-contents))
             (to end))
 	camel (create 
              xml-processing
