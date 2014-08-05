@@ -44,7 +44,6 @@
                        (process (map-tags-contents data-url :events))
                        (to mashed)))]
     (start-test camel start mashed)
-    (send-text-message camel start "")
     (stop-test camel)
     ))
 
