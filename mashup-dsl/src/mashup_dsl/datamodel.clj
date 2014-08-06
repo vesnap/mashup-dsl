@@ -233,12 +233,6 @@
            [m1 m2 key1 key2]
             (when (= (m1 key1) (m2 key2)) (into  m2 m1)))
 
-;;;;ne znam za ovo (clojure.set/join test-left test-right {:name :owner})
-;(join  {"Steve Bug" :title} {"Usce Zero" :title} :title :title)
-;{"Usce Zero" :title, "Steve Bug" :title}
-;=> (join  {"Steve Bug" :title} {"Usce Zero" :name} :title :name)
-;{"Usce Zero" :name, "Steve Bug" :title}
-  ;and i  or za join
 
   (defn left-join [key-map xs ys]
      (let [kes (seq key-map)
@@ -292,7 +286,7 @@
 
 ;;;;;merging;;;;;;;
 ;;;;;using sets;;;; 
-
+;;;;;this is used in content enrich;;;
 
 ;(clojure.set/join (vec item1) (vec item2) {:name :title})
 ;;;and then everything back to vector
