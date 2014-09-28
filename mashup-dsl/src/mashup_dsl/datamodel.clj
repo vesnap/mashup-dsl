@@ -9,12 +9,22 @@
     [clojure.java.io :as io]
     [clojure.pprint :as pp]
     [clojure.string :as s]
+    [net.cgrand.enlive-html :as html]
     ))
+
+;;;;to do ;;;;
+;;;add parsing json data
+;;;add facebook api calls
+
+
+
 
 ;example api url
 (def data-url
-  "http://api.eventful.com/rest/events/search?app_key=4H4Vff4PdrTGp3vV&keywords=music&location=Belgrade&date=Future")
+  "http://api.eventful.com/rest/events/search?app_key=4H4Vff4PdrTGp3vV&keywords=music&location=New+York&date=Future")
 
+(defn create-api-call [start-original-url condition rest-original-url]
+  (str start-original-url  condition rest-original-url))
 
 ;;parsing source data;;;
 
@@ -112,14 +122,9 @@
 ;;;and it works perfectly;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;
 
-(def events-xml
-     (memoize (fn [] (slurp data-url))))
 
-(def xmldoc
-     (memoize (fn [] (xml->doc (events-xml)))))
-
-(defn get-tags [maintag] ($x:text  maintag 
-                            (xmldoc)));maintag is "/events/event/title"
+;(defn get-tags [maintag] ($x:text  maintag 
+ ;                           (xmldoc)));maintag is "/events/event/title"
 
 (defn all-tags [doc]
   (map
@@ -153,12 +158,12 @@
        nodes))))
 
 
-(defn cc []( (visit-nodes []
-               ($x "./*" (xmldoc))
-               (fn [p n]
-                 (printf "%s tag:%s\n"
-                         (apply str (interpose "/" (map name p)))
-                         (name (:tag n)))))))
+;(defn cc []( (visit-nodes []
+ ;              ($x "./*" (xmldoc))
+  ;             (fn [p n]
+   ;              (printf "%s tag:%s\n"
+    ;                     (apply str (interpose "/" (map name p)))
+     ;                    (name (:tag n)))))))
 
 
 (defn all-paths [doc]
@@ -176,44 +181,52 @@
                   (fn [p n]
                     p))))))
 ;map of tags and its contents
+(def events-xml2 
+     (memoize (fn [] (slurp data-url))))
+(def xmldoc2 
+     (memoize (fn [] (xml->doc (events-xml2 )))))
+
 (defn mm [](map
              (fn [item]
                {:title ($x:text "./title" item)
                 :url  ($x:text "./url" item)})
              (take 5
-                   ($x "/search/events/event" (xmldoc)))))
+               ($x "/search/events/event" (xmldoc2)))))
+(defn events-xml [url]
+     (memoize (fn [] (slurp url))))
+
+(defn xmldoc [url]
+     (memoize (fn [] (xml->doc (events-xml url)))))
+
+(defn item [url](take 5 ($x "/search/events/event" (xmldoc url))))
 
 
-(def item (take 5 ($x "/search/events/event" (xmldoc))))
+(defn create-root-tag [tags] 
+  (str "/"(apply str (interpose \/ tags))))
 
-
-(defn create-xpath [tag] (str "./" tag))
-
+(defn create-xpath [tag]
+  (str "./" tag))
 (def tags ["title" "url"])
 
-(defn parse2 [item]
-        (doseq [tag tags](into {} (keyword tag) ($x:text (create-xpath tag) item)) ))
+;(defn parse2 [item]
+ ;       (doseq [tag tags](into {} (keyword tag) ($x:text (create-xpath tag) item)) ))
 
-(def ks [:url :title])
+
 
 (defn msh-contents2 [](zipmap [:data-content :title] [ (vec (map
                          (fn [item]
                            {:title ($x:text "./title" item)
                             :url  ($x:text "./url" item)})
                          (take 5
-                               ($x "/search/events/event" (xmldoc))))) "Events mashup"]))
+                               ($x "/search/events/event" (xmldoc2) )))) "Events mashup"]))
 ;this is generalized version of msh-contents2
-(defn msh-contents [mshpname root-tag & tags]
-        (zipmap [:data-contents :title] 
-                [(vec (map ( fn[item] 
-                            ( for[tag tags]
-                              {(keyword tag) ($x:text(create-xpath tag) item)}))
-                           (take 5
-                                  ($x root-tag (xmldoc))))) mshpname]))
-
    
-
-       
+(defn msh-contents-try [url root-tag mshpname tags]
+  (let [events-xml (memoize (fn [] (slurp url)))
+        xmldoc (memoize (fn [] (xml->doc (events-xml ))))
+        items (take 5 ($x root-tag (xmldoc)))
+        f (fn[item] (map #({(keyword %) ($x:text (create-xpath %) item)}) tags))]
+    (zipmap [:mashup-content :mashup-name] [(vec (f items)) mshpname])))
 ;;;;;merging;;;;
 
 ;example functions for joining maps of data
@@ -299,4 +312,3 @@
 ;for merging maps join from clojure.set is used
 (defn merge-data [item1 item2 vec-of-names] 
  (vec (clojure.set/join (vec item1) (vec item2) vec-of-names)))
-

@@ -35,7 +35,7 @@
 
 
 (defn template-div []
-  (h/html [:style {:type "text/css"} 
+  (html/html [:style {:type "text/css"} 
             ".Table
     {
         display: table;
@@ -43,7 +43,6 @@
     .Title
     {
         display: table-caption;
-        text-align: center;
         font-weight: bold;
         font-size: larger;
     }
@@ -76,7 +75,7 @@
                             [:p "Row 1 Column 1"]]]]))
 
 (defn index []
-  (h/html [:html 
+  (html/html [:html 
            [:style {:type "text/css"} 
             ".Table
     {
@@ -131,18 +130,24 @@
 (html/defsnippet value-cell (template-div) [:div.Row :div.Cell] [value]
               (html/content value))
 
+;na svaki vektor da dodam row tag
+(html/defsnippet row-snipp (template-div) [:div.Row] [values]
+((letfn[(mapv vals (map (fn [map] (apply merge (for [[k v] map] (assoc {} k (value-cell v))))) values))]
+  html/content (dodo values))))
+
+(defn update-map [m f] (reduce-kv (fn [m k v] (assoc m k (f v))) {} m))
+
 (html/deftemplate mshp (index) [cont]
                [:div.Title] (html/content (:title cont))
                [:div.Heading] 
                (html/content (for [c (keys (first (:data-content cont)))] (header-cell (name c))))
                [:div.Row] 
-               (html/content (map #(value-cell %) (for[e (:data-content cont)] (vals e)))))
+               (html/content (map #(update-map % value-cell) (:data-content cont))))
 
-;call to my lovely template (mshp (:data-content(data-for-mashup-stack "events" (xx))))
 
 (def routes 
      (app
-      [""]  (fn [req] (render-to-response (mshp (msh-contents))))
+      [""]  (fn [req] (render-to-response (mshp (msh-contents2))))
       ;(fn [req] render-to-response (indeks content-t))
       [&]   page-not-found))
 

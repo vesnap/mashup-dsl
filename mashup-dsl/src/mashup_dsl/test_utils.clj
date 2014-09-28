@@ -11,7 +11,8 @@
 	   [org.apache.camel ProducerTemplate]
     [org.apache.camel.component.file FileEndpoint]
     [org.apache.camel.component.file FileComponent]
-    [org.apache.camel.component.direct DirectComponent]))
+    [org.apache.camel.component.direct DirectComponent]
+    [org.apache.camel.component.http HttpComponent]))
 
 
 (defn file-comp[file-name]
@@ -25,6 +26,9 @@
 
 (defn direct [url]
 (DirectEndpoint. url (directComponent)))
+
+(defn http-component []
+(HttpComponent.  ))
 
 (defn- init [context endpoints]
   (if-not (empty? endpoints)

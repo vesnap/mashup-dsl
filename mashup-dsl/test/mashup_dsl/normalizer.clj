@@ -20,19 +20,22 @@
     (recur context (rest endpoints)))))
 
 ;normalizer is combination of router and transformer
+;for every transformation there's a processor
+;processor as in arg gets the fn for transformation
+
 (deftest normalizer-pattern
-    (let [start (direct data-url)
+    (let [
        end   (mock "normalized")			
     xml-processing 
-				  (route (from start)
+				  (route (from data-url)
             ( process #(msh-contents))
             (to end))
 	camel (create 
              xml-processing
                  )]
-    (start-test camel start end)
+    (start-test camel  end)
  
-    ;(is-message-count end 1)
+   (is-message-count end 1)
     (stop-test camel)))
 
 ;(let [normalize-xml (route (from (direct data-url)) (process msh-contents) (to (mock "normalized")))] (create normalize-xml))
