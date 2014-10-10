@@ -19,21 +19,6 @@
                            :start-time "start time 2"
                            :end-time "end time 2"}]})
 
-
-;define snippets for "cell" and "row"
-
-(def div-wrapper  (html/wrap :div {:class "psdg-right"}) )
-(def title-wrapper (html/wrap :div {:class "psdg-left"}))
-
-(defn make-div [elements ] (map div-wrapper elements))
-
-(defn make-a-row [title values]
-  (merge [ (title-wrapper title) (make-div values)]))
-
-
-;(defn template-div[] (html/html-resource "index.html"))
-
-
 (defn template-div []
   (html/html [:style {:type "text/css"} 
             ".Table
@@ -116,24 +101,18 @@
                              [:div {:class "Cell"}
                                    [:p "Row 1 Column 1"]]]]]))
 
-(def cell-selector (html/select (template-div)  [:div.psdg-right]))
- 
-(html/defsnippet cell-model "index.html" cell-selector
-  [data]
-  [:div.psdg-right] 
-        (html/content data ))
-
 
 (html/defsnippet header-cell (template-div) [:div.Heading :div.Cell] [value]
               (html/content value))
 
-(html/defsnippet value-cell (template-div) [:div.Row :div.Cell] [value]
-              (html/content value))
+(html/defsnippet value-cell (template-div) [:div.Row :div.Cell] [values]
+             (html/clone-for [value values]
+                     (html/content value)))
 
-;na svaki vektor da dodam row tag
-(html/defsnippet row-snipp (template-div) [:div.Row] [values]
-((letfn[(mapv vals (map (fn [map] (apply merge (for [[k v] map] (assoc {} k (value-cell v))))) values))]
-  html/content (dodo values))))
+
+(html/defsnippet  value-row (template-div) 
+                 [:div.Row] [event-data] (html/clone-for [vs event-data] [:div.Cell]
+                                                         (html/clone-for [v vs] (html/content v))))
 
 (defn update-map [m f] (reduce-kv (fn [m k v] (assoc m k (f v))) {} m))
 
@@ -142,7 +121,7 @@
                [:div.Heading] 
                (html/content (for [c (keys (first (:data-content cont)))] (header-cell (name c))))
                [:div.Row] 
-               (html/content (map #(update-map % value-cell) (:data-content cont))))
+              (html/content (value-row (mapv vals (:data-content cont)))))
 
 
 (def routes 
