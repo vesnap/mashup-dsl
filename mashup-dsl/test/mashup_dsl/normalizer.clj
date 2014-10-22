@@ -2,15 +2,13 @@
 
   (:use [clojure.test]
         [mashup-dsl.camel-dsl]
-    [net.cgrand.enlive-html :as en-html]
-   [mashup-dsl.datamodel]
-	[mashup-dsl.test-utils]
-)
-(:import [org.apache.camel.component.mock MockEndpoint]
-	  
-	   [org.apache.camel ProducerTemplate]
-    [org.apache.camel.component.file FileEndpoint]
-    [org.apache.camel.component.file FileComponent]))
+        [net.cgrand.enlive-html :as en-html]
+        [mashup-dsl.datamodel]
+	      [mashup-dsl.test-utils])
+  (:import [org.apache.camel.component.mock MockEndpoint]
+	         [org.apache.camel ProducerTemplate]
+           [org.apache.camel.component.file FileEndpoint]
+            org.apache.camel.component.file FileComponent]))
 ;to do define fns for transformation, these fns are in datamodel.clj
 
 
@@ -24,18 +22,13 @@
 ;processor as in arg gets the fn for transformation
 
 (deftest normalizer-pattern
-    (let [
-       end   (mock "normalized")			
-    xml-processing 
+    (let [end (mock "normalized")			
+          xml-processing 
 				  (route (from data-url)
-            ( process #(msh-contents))
-            (to end))
-	camel (create 
-             xml-processing
-                 )]
+          (process #((create-contents ["url" "title"] "//event" data-url)))
+          (to end))
+	        camel (create xml-processing)]
     (start-test camel  end)
- 
-   (is-message-count end 1)
+    (is-message-count end 1)
     (stop-test camel)))
 
-;(let [normalize-xml (route (from (direct data-url)) (process msh-contents) (to (mock "normalized")))] (create normalize-xml))
