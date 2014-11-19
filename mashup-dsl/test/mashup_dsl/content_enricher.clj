@@ -1,6 +1,6 @@
 (ns mashup-dsl.content-enricher
   (:use [clojure.test]
-        [mashup-dsl.camel-dsl]
+        [info.kovanovic.camelclojure.dsl]
         [clojure.set]
         [mashup-dsl.test-utils]
         [mashup-dsl.datamodel]))

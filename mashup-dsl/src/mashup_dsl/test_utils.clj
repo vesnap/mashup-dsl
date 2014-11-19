@@ -1,7 +1,7 @@
 (ns mashup-dsl.test-utils
   
   (:use [clojure.test]
-        [mashup-dsl.camel-dsl]
+        [info.kovanovic.camelclojure.dsl]
     [net.cgrand.enlive-html :as en-html]
     ;[datamodel]
 	;[info.kovanovic.camelclojure.test-util]
@@ -12,8 +12,17 @@
     [org.apache.camel.component.file FileEndpoint]
     [org.apache.camel.component.file FileComponent]
     [org.apache.camel.component.direct DirectComponent]
-    [org.apache.camel.component.http HttpComponent]))
+    [org.apache.camel.component.http HttpComponent]
+    [java.net URI]
+    [org.apache.camel.component.jetty JettyHttpEndpoint]
+    [org.apache.camel.component.jetty JettyHttpComponent]
+    ))
 
+(defn jetty-comp []
+  (JettyHttpComponent. ))
+
+(defn jetty-endpoint[url jettycomp]
+(.JettyHttpEndpoint jettycomp url (.URI (str "jetty:" url))))
 
 (defn file-comp[file-name]
   (FileEndpoint. (str "file://inbox[filename=" file-name "]") (FileComponent. ))) ;+fileName=thefilename.

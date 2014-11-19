@@ -1,8 +1,10 @@
 (ns mashup-dsl.aggregation
   (:use [clojure.test]
-        [mashup-dsl.camel-dsl]
+       ; [mashup-dsl.camel-dsl]
         [mashup-dsl.datamodel]
         [mashup-dsl.templating]
+        [info.kovanovic.camelclojure.dsl]
+       
       	[mashup-dsl.test-utils]))
   
 
