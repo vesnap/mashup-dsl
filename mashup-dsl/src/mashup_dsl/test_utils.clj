@@ -2,27 +2,23 @@
   
   (:use [clojure.test]
         [info.kovanovic.camelclojure.dsl]
-    [net.cgrand.enlive-html :as en-html]
-    ;[datamodel]
-	;[info.kovanovic.camelclojure.test-util]
-)
-(:import [org.apache.camel.component.mock MockEndpoint]
-	   [org.apache.camel.component.direct DirectEndpoint]
-	   [org.apache.camel ProducerTemplate]
+    [net.cgrand.enlive-html :as en-html])
+  (:import [org.apache.camel.component.mock MockEndpoint]
+	  [org.apache.camel.component.direct DirectEndpoint]
+	  [org.apache.camel ProducerTemplate]
     [org.apache.camel.component.file FileEndpoint]
     [org.apache.camel.component.file FileComponent]
     [org.apache.camel.component.direct DirectComponent]
     [org.apache.camel.component.http HttpComponent]
     [java.net URI]
     [org.apache.camel.component.jetty JettyHttpEndpoint]
-    [org.apache.camel.component.jetty JettyHttpComponent]
-    ))
+    [org.apache.camel.component.jetty JettyHttpComponent]))
 
 (defn jetty-comp []
   (JettyHttpComponent. ))
 
-(defn jetty-endpoint[url jettycomp]
-(.JettyHttpEndpoint jettycomp url (.URI (str "jetty:" url))))
+(defn jetty-endpoint[url]
+(JettyHttpEndpoint. (jetty-comp) url (URI. (str "jetty:" url))))
 
 (defn file-comp[file-name]
   (FileEndpoint. (str "file://inbox[filename=" file-name "]") (FileComponent. ))) ;+fileName=thefilename.

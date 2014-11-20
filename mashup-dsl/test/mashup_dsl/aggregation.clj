@@ -13,7 +13,7 @@
 	      f (fn []
 	       (mshp (create-contents ["url" "title"] "//event" data-url)));here, the mshp fn should be called, 
                                                                      ;and its output should be called by render-response
-	      r (route (from data-url)
+	      r (route (from data-url) 
 	       (aggregator f "type" :count 1)
 	       (to end))
 	      camel (create r)]
