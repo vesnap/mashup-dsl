@@ -12,7 +12,12 @@
     [org.apache.camel.component.http HttpComponent]
     [java.net URI]
     [org.apache.camel.component.jetty JettyHttpEndpoint]
-    [org.apache.camel.component.jetty JettyHttpComponent]))
+    [org.apache.camel.component.jetty JettyHttpComponent]
+    [org.apache.camel.component.timer TimerComponent]))
+
+
+
+(defn timer[] (TimerComponent. ))
 
 (defn jetty-comp []
   (JettyHttpComponent. ))
