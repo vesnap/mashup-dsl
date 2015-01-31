@@ -1,10 +1,9 @@
 (ns mashup-dsl.aggregation
   (:use [clojure.test]
-       ; [mashup-dsl.camel-dsl]
         [mashup-dsl.datamodel]
         [mashup-dsl.templating]
         [info.kovanovic.camelclojure.dsl]
-       
+       [midje.sweet]
       	[mashup-dsl.test-utils]))
   
 
@@ -22,3 +21,15 @@
    (is (= (count messages) 1)))
    (stop-test camel)))
 
+(fact "aggregator pattern"  
+        (let [end  (mock "end")
+	      f (fn []
+	      (mshp (create-contents ["url" "title"] "//event" data-url)))
+                                                                     
+	      r (route (from data-url) 
+	       (aggregator f "type" :count 1)
+	       (to end))
+	      camel (create r)]
+                         (start-test (camel) (jetty) (end))
+                         (is-message-count (end) 1)
+                         (stop-test (camel))))

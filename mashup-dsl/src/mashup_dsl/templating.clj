@@ -1,7 +1,7 @@
 (ns mashup-dsl.templating 
   (:use [net.cgrand.enlive-html :as html] 
         [net.cgrand.moustache ]
-        [mashup-dsl.utils]
+        [mashup-dsl.test-utils]
         [mashup-dsl.datamodel :as dm]
         [clojure.pprint]))
   

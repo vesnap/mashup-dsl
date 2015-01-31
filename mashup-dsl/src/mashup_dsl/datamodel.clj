@@ -32,6 +32,7 @@
 ;map of tags and its contents
 (def events-xml2 
      (memoize (fn [] (slurp data-url))))
+
 (def xmldoc2 
      (memoize (fn [] (xml->doc (events-xml2 )))))
 
@@ -60,12 +61,28 @@
   (defn defxmldoc [url]
     (xml->doc (xml-data url)))
   
-;this is generalized version of msh-contents2
-(defn msh-contents-try [url root-tag mshpname tags];probaj kod kuce
-    (let [ items (take 5 ($x root-tag (defxmldoc url)))
-        f (fn[item] (zipmap tags (map #($x:text (str %)) item))) ]
-    (zipmap [:data-content :title] [(vec (f items)) mshpname])))
-
+  (defn items [root-tag url] (take 5 ($x root-tag (defxmldoc url))))
+  
+  (defn text-fn [tag item] ($x:text ((str tag) item)))
+ 
+  
+  ;this is generalized version of msh-contents2 that doesn't work properly
+ 
+   (defn contents-extract [title url root-tag tags] 
+    (zipmap [:data-content :title] [(vec(map
+                         ((fn [item]
+                             (into {}
+                             (map (fn [tag]
+                                  [tag ($x:text (str "./" (name tag)) item)]) tags))))
+                         (take 5 ($x root-tag (xmldoc2))))) title]))
+  ;this works
+;(zipmap [:data-content :title] 
+ ;          [(vec (map(fn [item]
+  ;         (into {}
+   ;       (map (fn [tag]
+    ;       [tag ($x:text (str "./" (name tag)) item)])
+     ;      [:title :url])))(take 5
+      ;                            ($x "/search/events/event" (xmldoc2) )))) "Events mashup"])
 ;;;;;bit differnt
 
 (defn create-keys [tags]
@@ -108,11 +125,7 @@
  (mapv (fn [x] (if (= (:t1 x) (:t2 m)) (merge m x) x)) v))
 
 
-
-
-
-
-;;parsing source data;;;
+;;parsing source data;;
 
 ;getting data from url, returns tag element struct map - :tag, :attrs, and :content
 (defn parsing [url]
