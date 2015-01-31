@@ -6,7 +6,7 @@
         [mashup-dsl.datamodel]))
    
 
-(deftest content-enricher-pattern
+(fact "content-enricher-pattern"
   (let [mashed (mock "mash")
         camel (create (route (from data-url)
                       (process (enrich-map-with-data (into [] (v2)) (v1) :title :name))

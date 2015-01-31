@@ -1,35 +1,19 @@
 (ns mashup-dsl.aggregation
-  (:use [clojure.test]
-        [mashup-dsl.datamodel]
-        [mashup-dsl.templating]
-        [info.kovanovic.camelclojure.dsl]
-       [midje.sweet]
-      	[mashup-dsl.test-utils]))
+(:use [clojure.test]
+      [mashup-dsl.datamodel]
+      [mashup-dsl.templating]
+      [info.kovanovic.camelclojure.dsl]
+      [midje.sweet]
+      [mashup-dsl.test-utils]
+      [mashup-dsl.sources]))
   
 
-(deftest aggregator-pattern
-  (let [end  (mock "end")
-	      f (fn []
-	       (mshp (create-contents ["url" "title"] "//event" data-url)));here, the mshp fn should be called, 
-                                                                     ;and its output should be called by render-response
-	      r (route (from data-url) 
-	       (aggregator f "type" :count 1)
-	       (to end))
-	      camel (create r)]
-   (start-test camel  end)
-   (let [messages (get-received-messages end)]
-   (is (= (count messages) 1)))
-   (stop-test camel)))
 
 (fact "aggregator pattern"  
-        (let [end  (mock "end")
-	      f (fn []
-	      (mshp (create-contents ["url" "title"] "//event" data-url)))
-                                                                     
-	      r (route (from data-url) 
-	       (aggregator f "type" :count 1)
-	       (to end))
-	      camel (create r)]
-                         (start-test (camel) (jetty) (end))
-                         (is-message-count (end) 1)
-                         (stop-test (camel))))
+        (let [f (fn []
+                 (mshp (create-contents ["url" "title"] "//event" data-url)))                                                           
+	            r (route (from (jetty-endpoint data-url)) 
+	                     (aggregator f "type" :count 1))
+	            camel (create r)]
+         (start-test (camel) (jetty-endpoint data-url))
+         (stop-test (camel))))

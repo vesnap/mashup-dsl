@@ -2,8 +2,7 @@
 (:use [clojure.test]
       [mashup-dsl.test-utils]
       [info.kovanovic.camelclojure.dsl]
-      ;[net.cgrand.enlive-html :as en-html]
-     )
+      ;[net.cgrand.enlive-html :as en-html])
 (:import [org.apache.camel.component.mock MockEndpoint]
 	       [org.apache.camel.component.direct DirectEndpoint]
 	       [org.apache.camel ProducerTemplate]
@@ -14,21 +13,20 @@
          [java.net URI]
          [org.apache.camel.component.jetty JettyHttpEndpoint]
          [org.apache.camel.component.jetty JettyHttpComponent]
-         [org.apache.camel.component.timer TimerComponent]
-         ))
+         [org.apache.camel.component.timer TimerComponent]))
 
 
 
 (defn timer[] (TimerComponent. ))
 
 (defn jetty-comp []
-  (JettyHttpComponent. ))
+  (JettyHttpComponent.))
 
 (defn jetty-endpoint[url]
 (JettyHttpEndpoint. (jetty-comp) url (URI. (str "jetty:" url))))
 
 (defn file-comp[file-name]
-  (FileEndpoint. file-name (FileComponent. ))) ;+fileName=thefilename.
+  (FileEndpoint. file-name (FileComponent. )))
 
 (defn mock [url]
   (MockEndpoint. (str "mock://" url)))

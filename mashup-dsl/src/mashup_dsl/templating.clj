@@ -3,7 +3,8 @@
         [net.cgrand.moustache ]
         [mashup-dsl.test-utils]
         [mashup-dsl.datamodel :as dm]
-        [clojure.pprint]))
+        [clojure.pprint]
+        [mashup-dsl.test-utils]))
   
 
 (defn template-div []
@@ -69,13 +70,14 @@
               (html/substitute (value-row (mapv vals (:data-content cont)))))
 
 
+
 (def routes 
      (app
-      [""]  (fn [req] (render-to-response (mshp (zipmap [:data-content :title] [(create-contents ["url" "title"] "//event" data-url) "events mashup"]))))
+      [""]  (fn [req] (render-request (mshp (zipmap [:data-content :title] [(create-contents ["url" "title"] "//event" data-url) "events mashup"]))))
       [&]   page-not-found))
 
 ;; ========================================
 ;; The App
 ;; ========================================
 
-(defonce ^:dynamic *server* (run-server routes))
+(defonce ^:dynamic *server* (run-server* routes))
