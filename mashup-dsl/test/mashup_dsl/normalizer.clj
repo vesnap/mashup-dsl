@@ -9,16 +9,27 @@
 
 (defn jetty [](jetty-endpoint data-url))
 
-(defn jetty-google [] (jetty-endpoint "https://maps.googleapis.com/maps/api/place/search/json?location=40.446788,-79.950559&radius=500&types=food&sensor=false&key=AIzaSyCXQ-GOzJ3g1rdyVS4hAI4XJNGoCY9y1xQ"))
+(defn jetty-flights [] 
+  (jetty-endpoint "http://flightradar24.com/PlaneFeed.json"))
+
+(defn http-google [] 
+  (http-component ))
+
+(defn timer-end [] 
+  (timer 
+    "timer://pollingTimer?fixedRate=true&delay=0&period=600000" "timer-contenrich"))
 
 (defn end [](mock "normalized"))
 
-(defn camel [](create (route (from (jetty))
+(defn camel [](create (route (from (timer-end))
+                (to (jetty-flights))
                 (process 
                   #(contents-extract
                      "events" data-url "/search/events/event" 
-                     [:title :url])))))
+                     [:title :url]))
+                (to (end)))))
+
 (fact "normalizer pattern"  
-                         (start-test (camel) (jetty) (end))
+                         (start-test (camel) (timer-end) (jetty-flights)(end))
                          (is-message-count (end) 1)
                          (stop-test (camel)))

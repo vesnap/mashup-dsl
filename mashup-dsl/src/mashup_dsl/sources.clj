@@ -1,7 +1,7 @@
 (ns mashup-dsl.sources
 (:use [clojure.test]
       [mashup-dsl.test-utils]
-      [info.kovanovic.camelclojure.dsl]
+      [info.kovanovic.camelclojure.dsl])
       ;[net.cgrand.enlive-html :as en-html])
 (:import [org.apache.camel.component.mock MockEndpoint]
 	       [org.apache.camel.component.direct DirectEndpoint]
@@ -13,11 +13,13 @@
          [java.net URI]
          [org.apache.camel.component.jetty JettyHttpEndpoint]
          [org.apache.camel.component.jetty JettyHttpComponent]
-         [org.apache.camel.component.timer TimerComponent]))
+         [org.apache.camel.component.timer TimerComponent]
+         [org.apache.camel.component.timer TimerEndpoint]))
 
 
 
-(defn timer[] (TimerComponent. ))
+(defn timer[uri name] (TimerEndpoint. uri (TimerComponent.) name))
+
 
 (defn jetty-comp []
   (JettyHttpComponent.))

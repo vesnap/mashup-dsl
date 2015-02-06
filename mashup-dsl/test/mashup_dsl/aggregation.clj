@@ -12,7 +12,7 @@
 (fact "aggregator pattern"  
         (let [f (fn []
                  (mshp (create-contents ["url" "title"] "//event" data-url)))                                                           
-	            r (route (from (jetty-endpoint data-url)) 
+	            r (route (from (direct "enriched"))
 	                     (aggregator f "type" :count 1))
 	            camel (create r)]
          (start-test (camel) (jetty-endpoint data-url))

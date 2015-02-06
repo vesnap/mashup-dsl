@@ -19,7 +19,13 @@ First use or require mashup-dsl.dsl in your namespace, and you'll be able to cal
 
 ###Specifying data source
 
-Camel Jetty endpoint is used for defining data source. jetty function expects data source url in form of a string (between two doubl quote characters). Different endpoints from Camel that are needed in this
+In sources.clj, there are different functions used for specifying data sources. 
+TimerEndpoint is endpoint that can generate periodic inbound exchanges triggered by a timer.
+
+(defn timer [uri name] (TimerEndpoint. uri (TimerComponent.) name))
+
+
+Camel Jetty endpoint is used for defining data source. jetty function expects data source URL in form of a string (between two double quote characters). Different end points from Camel that are needed in this
 
     (defn jetty [data-url] (jetty-endpoint data-url))
     (defn jetty-google [] (jetty-endpoint "https://maps.googleapis.com/maps/api/place/search/json?location=40.446788,-79.950559&radius=500&types=food&sensor=false&key=AIzaSyCXQ-GOzJ3g1rdyVS4hAI4XJNGoCY9y1xQ"))
@@ -27,37 +33,31 @@ Camel Jetty endpoint is used for defining data source. jetty function expects da
 ###Using Normalizer for data translation
 
 Normalizer pattern is used for data translation. Function msh-contents is used for extracting and translating data from xml to clojure map.
+Route is defined as specified bellow
 
-    (ns mashup-dsl.normalizer
-    (:use [clojure.test]
-    [info.kovanovic.camelclojure.dsl]
-    [mashup-dsl.datamodel]
-    [mashup-dsl.test-utils]
-    [midje.sweet])
-    (:require [clojure.data.json :as json]))
-    (defn jetty [](jetty-endpoint data-url))
-    (defn end [] (mock "normalized"))
-    (defn camel [](create (route (from (jetty))
-        (process #(contents-extract  "events" data-url "/search/events/event" [:title :url])))))
-        (fact "normalizer pattern"  
-        (start-test (camel) (jetty) (end))
-        (is-message-count (end) 1)
-        (stop-test (camel)))
+    (defn camel [](create (route (from (timer-end))
+                (to (jetty-flights))
+                (process 
+                  #(contents-extract
+                     "events" data-url "/search/events/event" 
+                     [:title :url]))
+                (to (end)))))
+    
 
-##Using Content Enricher for combining data
+##Using Content Enricher pattern for combining data
 
-Content Enricher pattern is used for enriching initial data with data from other sources, the enrich-map-with-data function is used.
+Content Enricher pattern is used for enriching initial data with data from other sources, the enrich-with-artist function is used, in this function aggregation strategy is defined.
+    (fact "content-enricher-pattern"
+  (let [start (direct "normalized")
+        enriched (mock "enriched")
+        camel (create (route (from (timer-endpoint))
+                      (process #(enrich-with-artist) 
+                      (to enriched))))]
+   (start-test camel  start enriched)
+   (is-message-count enriched 1)
+   (stop-test camel)))
 
-    (deftest content-enricher-pattern
-    (let [mashed (mock "mash")
-    camel (create (route (from data-url)
-                  (process #(enrich-map-with-data (into [] (v2)) (v1) :title :name))
-                  (to mashed)))]
-    (start-test camel  mashed)
-    (is-message-count mashed 1)
-    (stop-test camel)))
-
-##Using Aggregator for creating html page out of a template
+##Using Aggregator pattern for creating html page out of a template
 
 Aggregator pattern is used to create html page for display, enriched data is combined with html template, and mshp function is used.
 

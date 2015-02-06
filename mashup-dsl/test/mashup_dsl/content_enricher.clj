@@ -3,14 +3,19 @@
         [info.kovanovic.camelclojure.dsl]
         [clojure.set]
         [mashup-dsl.test-utils]
-        [mashup-dsl.datamodel]))
-   
+        [mashup-dsl.datamodel]
+        [midje.sweet]
+        [mashup-dsl.sources]))
+  
+
+(defn enrich-with-artist []);ovde ideo onaj aggregationstrategy
 
 (fact "content-enricher-pattern"
-  (let [mashed (mock "mash")
-        camel (create (route (from data-url)
-                      (process (enrich-map-with-data (into [] (v2)) (v1) :title :name))
-                      (to mashed)))]
-   (start-test camel  mashed)
-   (is-message-count mashed 1)
+  (let [start (direct "normalized")
+        enriched (mock "enriched")
+        camel (create (route (from (timer-endpoint))
+                      (process #(enrich-with-artist) 
+                      (to enriched))))]
+   (start-test camel  start enriched)
+   (is-message-count enriched 1)
    (stop-test camel)))
