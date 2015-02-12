@@ -22,7 +22,7 @@ First use or require mashup-dsl.dsl in your namespace, and you'll be able to cal
 In sources.clj, there are different functions used for specifying data sources. 
 TimerEndpoint is endpoint that can generate periodic inbound exchanges triggered by a timer.
 
-(defn timer [uri name] (TimerEndpoint. uri (TimerComponent.) name))
+    (defn timer [uri name] (TimerEndpoint. uri (TimerComponent.) name))
 
 
 Camel Jetty endpoint is used for defining data source. jetty function expects data source URL in form of a string (between two double quote characters). Different end points from Camel that are needed in this
@@ -47,15 +47,16 @@ Route is defined as specified bellow
 ##Using Content Enricher pattern for combining data
 
 Content Enricher pattern is used for enriching initial data with data from other sources, the enrich-with-artist function is used, in this function aggregation strategy is defined.
+
     (fact "content-enricher-pattern"
-  (let [start (direct "normalized")
+    (let [start (direct "normalized")
         enriched (mock "enriched")
         camel (create (route (from (timer-endpoint))
                       (process #(enrich-with-artist) 
                       (to enriched))))]
-   (start-test camel  start enriched)
-   (is-message-count enriched 1)
-   (stop-test camel)))
+    (start-test camel  start enriched)
+    (is-message-count enriched 1)
+    (stop-test camel)))
 
 ##Using Aggregator pattern for creating html page out of a template
 

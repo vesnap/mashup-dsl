@@ -37,12 +37,12 @@
      (memoize (fn [] (xml->doc (events-xml2 )))))
 
 
-(defn msh-contents2 [](zipmap [:data-content :title] [ (vec (map
-                         (fn [item]
-                           {:title ($x:text "./title" item)
-                            :url  ($x:text "./url" item)})
-                         (take 5
-                               ($x "/search/events/event" (xmldoc2) )))) "Events mashup"]))
+(defn msh-contents2 [](zipmap [:data-content :title] 
+                              [(vec (map (fn [item]
+                                         {:title ($x:text "./title" item)
+                                          :url  ($x:text "./url" item)})
+                               (take 5
+                               ($x "/search/events/event"(xmldoc2)))))"Events mashup"]))
 
 
 (defn item [url root-tag](take 5 ($x root-tag (xmldoc2 ))))
@@ -66,24 +66,14 @@
   (defn text-fn [tag item] ($x:text ((str tag) item)))
  
   
-  ;this is generalized version of msh-contents2 that doesn't work properly
- 
-   (defn contents-extract [title url root-tag tags] 
-    (zipmap [:data-content :title] [(vec(map
-                         ((fn [item]
-                             (into {}
-                             (map (fn [tag]
-                                  [tag ($x:text (str "./" (name tag)) item)]) tags))))
+  (defn contents-extract [title url root-tag tags] 
+    (zipmap [:data-content :title] 
+            [(vec(map(fn [item]
+                      (into {}
+                      (map (fn [tag]
+                            [tag ($x:text (str "./" (name tag))item)])tags)))
                          (take 5 ($x root-tag (xmldoc2))))) title]))
-  ;this works
-;(zipmap [:data-content :title] 
- ;          [(vec (map(fn [item]
-  ;         (into {}
-   ;       (map (fn [tag]
-    ;       [tag ($x:text (str "./" (name tag)) item)])
-     ;      [:title :url])))(take 5
-      ;                            ($x "/search/events/event" (xmldoc2) )))) "Events mashup"])
-;;;;;bit differnt
+
 
 (defn create-keys [tags]
   (into [] (map keyword tags)))
@@ -99,12 +89,7 @@
 ;;;;;;;;contents for mashup;;;;;;
 
 (defn contents-for-mashup [func mshpname]
-  ;;this 
-  ;;;;(zipmap [:data-content :title] [(create-contents ["url" "title"] "//event" data-url) "events mashup"])
-  ;;;;works  
   (zipmap [:data-content :title] [func mshpname]));;doesn't work properly
-
-  
 
 
 ;;;;;merging;;;;;;;
@@ -112,17 +97,10 @@
 ;;;;;this is used in content enrich;;;
 
 
-;items for testing
-(def item1 '({:title "title 1", :url "url1"} {:title "title 2", :url "url2"}))
-(def item2 '({:name "title 1", :something "sss"} {:name "title 2", :something "ssss2222"}))
 
 ;for merging maps join from clojure.set is used
 (defn merge-data [item1 item2 vec-of-names] 
  (vec (clojure.set/join (vec item1) (vec item2) vec-of-names)))
-
-;enriching map, adding values;desn't work properly....
-(defn enrich-map-with-data [v m t1 t2]
- (mapv (fn [x] (if (= (:t1 x) (:t2 m)) (merge m x) x)) v))
 
 
 ;;parsing source data;;

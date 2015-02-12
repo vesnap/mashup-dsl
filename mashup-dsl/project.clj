@@ -22,8 +22,7 @@
                 [org.clojure/tools.logging "0.2.6"]
                 [com.github.kyleburton/clj-xpath "1.4.3"]
                 [com.novemberain/monger "2.0.0"]
-                [org.clojure/data.json "0.2.5"]
-              ]
+                [org.clojure/data.json "0.2.5"]]
     :repositories {"local"  "C:/Users/pvmd/.m2/repository"}
   :plugins [[lein-localrepo "0.5.2"]]
   
