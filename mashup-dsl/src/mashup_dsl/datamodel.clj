@@ -100,7 +100,7 @@
 
 ;for merging maps join from clojure.set is used
 (defn merge-data [item1 item2 vec-of-names] 
- (vec (clojure.set/join (vec item1) (vec item2) vec-of-names)))
+ (vec (clojure.set/join item1  item2 vec-of-names)))
 
 
 ;;parsing source data;;
