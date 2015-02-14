@@ -23,6 +23,12 @@
 (defn create-api-call [start-original-url condition rest-original-url]
   (str start-original-url  condition rest-original-url))
 
+(defn debomify
+     [^String line]
+     (let [bom "\uFEFF"]
+       (if (.startsWith line bom)
+         (.substring line 1)
+         line)))
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;;;using clj-xpath;;;;
@@ -31,7 +37,7 @@
 
 ;map of tags and its contents
 (def events-xml2 
-     (memoize (fn [] (slurp data-url))))
+     (memoize (fn []  (debomify (slurp data-url)))))
 
 (def xmldoc2 
      (memoize (fn [] (xml->doc (events-xml2 )))))
@@ -56,7 +62,7 @@
 (def tags ["title" "url"])
 
 
-  (defn xml-data [url] (slurp url))
+  (defn xml-data [url] (debomify (slurp url)))
   
   (defn defxmldoc [url]
     (xml->doc (xml-data url)))
@@ -72,8 +78,13 @@
                       (into {}
                       (map (fn [tag]
                             [tag ($x:text (str "./" (name tag))item)])tags)))
-                         (take 5 ($x root-tag (xmldoc2))))) title]))
+                         (take 5 ($x root-tag (defxmldoc url))))) title]))
 
+  (defn contents-only [url root-tag tags] (vec(map(fn [item]
+                      (into {}
+                      (map (fn [tag]
+                            [tag ($x:text (str "./" (name tag))item)])tags)))
+                         (take 5 ($x root-tag (defxmldoc url))))))
 
 (defn create-keys [tags]
   (into [] (map keyword tags)))
@@ -86,10 +97,6 @@
 (defn create-contents [tags root-tag data-url] 
   ( vec(map #(zipmap (create-keys tags) %) (func-contents tags root-tag data-url))))
   
-;;;;;;;;contents for mashup;;;;;;
-
-(defn contents-for-mashup [func mshpname]
-  (zipmap [:data-content :title] [func mshpname]));;doesn't work properly
 
 
 ;;;;;merging;;;;;;;
@@ -97,10 +104,9 @@
 ;;;;;this is used in content enrich;;;
 
 
-
 ;for merging maps join from clojure.set is used
-(defn merge-data [item1 item2 vec-of-names] 
- (vec (clojure.set/join item1  item2 vec-of-names)))
+(defn merge-data [item1 item2 map-of-names] 
+ (vec (clojure.set/join (set item1)  (set item2) map-of-names)))
 
 
 ;;parsing source data;;
