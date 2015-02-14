@@ -14,7 +14,8 @@
 ;;;add parsing json data
 ;;;add facebook api calls
 ;;;add twitter api calls
-
+;todo nested tags
+;(map #(-> % :attrs :title) ($x "//book" *some-xml*))
 
 ;example api url
 (def data-url
@@ -36,22 +37,13 @@
 
 
 ;map of tags and its contents
-(def events-xml2 
-     (memoize (fn []  (debomify (slurp data-url)))))
-
-(def xmldoc2 
-     (memoize (fn [] (xml->doc (events-xml2 )))))
-
-
-(defn msh-contents2 [](zipmap [:data-content :title] 
-                              [(vec (map (fn [item]
-                                         {:title ($x:text "./title" item)
-                                          :url  ($x:text "./url" item)})
-                               (take 5
-                               ($x "/search/events/event"(xmldoc2)))))"Events mashup"]))
-
 
 (defn item [url root-tag](take 5 ($x root-tag (xmldoc2 ))))
+
+(defn create-keys [tags]
+  (into [] (map keyword tags)))
+
+(defn tag-fn [tag] (partial $x:text tag))
 
 (defn create-root-tag [tags] 
   (str "/"(apply str (interpose \/ tags))))
@@ -59,44 +51,49 @@
 (defn create-xpath [tag]
   (str "./" tag))
 
-(def tags ["title" "url"])
+(defn xml-data [url] (debomify (slurp url)))
+  
+(defn defxmldoc [url]
+  (xml->doc (xml-data url)))
+  
 
-
-  (defn xml-data [url] (debomify (slurp url)))
+(defn items [root-tag url] 
+  (take 5 ($x root-tag (defxmldoc url))))
   
-  (defn defxmldoc [url]
-    (xml->doc (xml-data url)))
-  
-  (defn items [root-tag url] (take 5 ($x root-tag (defxmldoc url))))
-  
-  (defn text-fn [tag item] ($x:text ((str tag) item)))
+(defn text-fn [tag item]
+  ($x:text ((str tag) item)))
  
+(defn build-path
+  ([sep kys] (build-path nil sep kys))
+  ([root sep kys]
+   (->> kys (map name) (interpose sep) 
+        (concat (when root (list root sep))) (apply str))))
+
+(defn path
+  "build a path from a collection"
+  [t]
+  (build-path "." \/ t))
+
+
+(defn path-key
+  "Transform [:a :b :c] into :a-b-c"
+  [t]
+  (->> t (build-path \-) keyword))
   
-  (defn contents-extract [title url root-tag tags] 
-    (zipmap [:data-content :title] 
-            [(vec(map(fn [item]
-                      (into {}
-                      (map (fn [tag]
-                            [tag ($x:text (str "./" (name tag))item)])tags)))
-                         (take 5 ($x root-tag (defxmldoc url))))) title]))
-
-  (defn contents-only [url root-tag tags] (vec(map(fn [item]
-                      (into {}
-                      (map (fn [tag]
-                            [tag ($x:text (str "./" (name tag))item)])tags)))
-                         (take 5 ($x root-tag (defxmldoc url))))))
-
-(defn create-keys [tags]
-  (into [] (map keyword tags)))
-
-(defn tag-fn [tag] (partial $x:text tag))
-
-(defn func-contents [tags root-tag data-url] 
-  (map (apply juxt (map tag-fn tags)) (take 2 ($x root-tag (xml->doc (slurp data-url ))))))
-
-(defn create-contents [tags root-tag data-url] 
-  ( vec(map #(zipmap (create-keys tags) %) (func-contents tags root-tag data-url))))
-  
+(defn contents-extract [title url root-tag tags] 
+  (zipmap [:data-content :title] 
+          [(vec(map(fn [item]
+                     (into {}
+                           (map (fn [tag]
+                                  [tag ($x:text (str ".//" (name tag))item)])tags)))
+                   (take 5 ($x root-tag (defxmldoc url)))))title]))
+(defn contents-only [url root-tag tags]
+  (vec (map(fn [item]
+             (into {}
+                   (map (fn [tag]
+                          [(path-key tag) ($x:text (path tag) item)])
+                        tags)))
+           (take 5 ($x root-tag (defxmldoc url))))))
 
 
 ;;;;;merging;;;;;;;

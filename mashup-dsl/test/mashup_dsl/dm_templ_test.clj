@@ -10,20 +10,28 @@
   #{{:name "title 1" :something "sss"} {:name "title 2" :something "ssss2222"}})
 
 
-(def lastfmartist "http://ws.audioscrobbler.com/2.0/?method=artist.search&artist=cher&api_key=00c6b7abec24599649bfcecf19c08cf1")
+(def lastfmartist "http://ws.audioscrobbler.com/2.0/?method=artist.search&artist=Lindsey%20Buckingham&api_key=00c6b7abec24599649bfcecf19c08cf1")
 
 ;testing merging of 2 contents
 (fact "merge-test"
      (merge-data source1 source2 {:title :name}) )
 
+(fact "merge real data"
+      (merge-data
+        (set(contents-only data-url "/search/events/event" [[:title]
+                          [:performers :performer :id]
+                          [:performers :performer :name]])) 
+        (set(contents-only 
+                 lastfmartist  "/lfm/results/artistmatches/artist"
+                            [[:name]
+                             [:url]]))))
+
 ;extractiong data with title of mashup
 (fact "contents-extract-test"
-      (contents-extract "events" data-url "/search/events/event" [:title :url] ))
-
-
-;extractiong data without title
-(fact "contents only"
-      (contents-only data-url "/search/events/event" [:title :url]))
+      (first (contents-only data-url "/search/events/event"
+                         [[:title]
+                          [:performers :performer :id]
+                          [:performers :performer :name]]))
 
 ;testing create set out of contents
 (fact "set-test"
@@ -32,7 +40,7 @@
                             data-url "/search/events/event" [:title :url]))))
 
 (fact "contents-artist"
-      ((contents-only 
-           lastfmartist "/lfm/results/artistmatches/artist" [:name :mbid]))
-      
-      
+     (first (contents-only lastfmartist
+                          "/lfm/results/artistmatches/artist"
+                            [[:name]
+                             [:url]]))

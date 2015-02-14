@@ -5,8 +5,11 @@
   [mashup-dsl.normalizer :as norm]
   [mashup-dsl.aggregate :as agg])
 
-(defn extract-contents [title url root-tag tags]
+(defn contents-extract [title url root-tag tags]
   (dm/contents-extract title url root-tag tags))
+
+(defn extract-contents-only  [url root-tag tags]
+  (dm/contents-only url root-tag tags))
 
 (defn merge-data [item1 item2 vec-of-names]
   (dm/merge-data item1 item2 vec-of-names))
