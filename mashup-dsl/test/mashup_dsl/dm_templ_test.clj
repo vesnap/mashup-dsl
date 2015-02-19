@@ -17,14 +17,14 @@
      (merge-data source1 source2 {:title :name}) )
 
 (fact "merge real data"
-      (merge-data
-        (set(contents-only data-url "/search/events/event" [[:title]
+      (left-join
+       {:name :name} (contents-only data-url "/search/events/event" [[:title]
                           [:performers :performer :id]
-                          [:performers :performer :name]])) 
-        (set(contents-only 
+                          [:performers :performer :name]]) 
+        (contents-only 
                  lastfmartist  "/lfm/results/artistmatches/artist"
                             [[:name]
-                             [:url]]))))
+                             [:url]])))
 
 ;extractiong data with title of mashup
 (fact "contents-extract-test"

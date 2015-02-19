@@ -14,8 +14,7 @@
 ;;;add parsing json data
 ;;;add facebook api calls
 ;;;add twitter api calls
-;todo nested tags
-;(map #(-> % :attrs :title) ($x "//book" *some-xml*))
+
 
 ;example api url
 (def data-url
@@ -38,7 +37,6 @@
 
 ;map of tags and its contents
 
-(defn item [url root-tag](take 5 ($x root-tag (xmldoc2 ))))
 
 (defn create-keys [tags]
   (into [] (map keyword tags)))
@@ -55,7 +53,9 @@
   
 (defn defxmldoc [url]
   (xml->doc (xml-data url)))
-  
+
+  (defn item [url root-tag](take 5 ($x root-tag (defxmldoc url ))))
+
 
 (defn items [root-tag url] 
   (take 5 ($x root-tag (defxmldoc url))))
@@ -87,6 +87,7 @@
                            (map (fn [tag]
                                   [tag ($x:text (str ".//" (name tag))item)])tags)))
                    (take 5 ($x root-tag (defxmldoc url)))))title]))
+
 (defn contents-only [url root-tag tags]
   (vec (map(fn [item]
              (into {}
@@ -104,6 +105,23 @@
 ;for merging maps join from clojure.set is used
 (defn merge-data [item1 item2 map-of-names] 
  (vec (clojure.set/join (set item1)  (set item2) map-of-names)))
+
+
+
+
+(defn enrich-map [map1 text map2]
+  ;vec is vector that contains starting map, and map2 is contents used for enriching, tag is from map
+    ( when (contains?  map1 text) assoc  map1 map2))
+;merge row by row
+
+(defn row-join 
+  ;ovaj join radi za 1 red, sad treba da posaljem ceo vektor sa mapama
+           [m1 m2 key1 key2]
+            (when (= (m1 key1) (m2 key2)) (into  m2 m1)))
+
+
+(defn merge-rows [vec1 map1 tag1 tag2]
+  (mapv (fn[map2](row-join  map1 map2 tag1 tag2)) vec1))
 
 
 ;;parsing source data;;
@@ -158,9 +176,6 @@
      (reduce merge-disjoint m1 (cons m2 maps))))
 
 
-(defn row-join ;ovaj join radi za 1 red, sad treba da posaljem ceo vektor sa mapama
-           [m1 m2 key1 key2]
-            (when (= (m1 key1) (m2 key2)) (into  m2 m1)))
 
 
   (defn left-join [key-map xs ys]
