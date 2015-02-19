@@ -44,3 +44,9 @@
                           "/lfm/results/artistmatches/artist"
                             [[:name]
                              [:url]]))
+     
+     (fact "contents without tags"
+           ((get-content-from-tags data-url :events :event :title)))
+     
+     (fact "contents and tags"
+           ((map-tags-contents data-url :events :event :title)))
