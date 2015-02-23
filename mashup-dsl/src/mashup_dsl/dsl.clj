@@ -14,6 +14,9 @@
 (defn merge-data [item1 item2 vec-of-names]
   (dm/merge-data item1 item2 vec-of-names))
 
+(defnt left-join [mapoftags v1 v2]
+  (dm/left-join mapoftags v1 v2))
+
 (defn mashup [cont]
   (tmpl/mshp cont))
 

@@ -18,7 +18,8 @@
 
 
 
-(defn timer[uri name] (TimerEndpoint. uri (TimerComponent.) name))
+(defn timer[uri name] 
+  (TimerEndpoint. uri (TimerComponent.) name))
 
 
 (defn jetty-comp []
