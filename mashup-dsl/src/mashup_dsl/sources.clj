@@ -14,7 +14,8 @@
          [org.apache.camel.component.jetty JettyHttpEndpoint]
          [org.apache.camel.component.jetty JettyHttpComponent]
          [org.apache.camel.component.timer TimerComponent]
-         [org.apache.camel.component.timer TimerEndpoint]))
+         [org.apache.camel.component.timer TimerEndpoint]
+         [java.lang Thread]))
 
 
 
@@ -29,10 +30,10 @@
 (JettyHttpEndpoint. (jetty-comp) url (URI. (str "jetty:" url))))
 
 (defn file-comp[file-name]
-  (FileEndpoint. file-name (FileComponent. )))
+  (FileEndpoint. (str "file:\\" file-name) (FileComponent.)))
 
 (defn mock [url]
-  (MockEndpoint. (str "mock://" url)))
+  (MockEndpoint. (str "mock:\\" url)))
 
 (defn directComponent []
   (DirectComponent. ))
@@ -44,5 +45,5 @@
 (HttpComponent.  ))
 
 (defn set-header[name val]
-  (.setHeader (name,val)))
+  (.setHeader name val))
 

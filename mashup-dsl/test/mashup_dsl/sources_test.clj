@@ -4,27 +4,32 @@
         [info.kovanovic.camelclojure.dsl]
         [mashup-dsl.test-utils]))
 
-;(defn camel2 [](create (route (from (timer "timer://foo?fixedRate=true&delay=0&period=10000" "timer"))
- ;               (to (jetty-endpoint "http://www.google.com"))
-  ;              (to  (file-comp "target/google")))))
 
-;(fact "google get"  
-;(start-test (camel2))
-;(stop-test (camel2)))
-(def file-in (file-comp "data/inbox/test.txt?noop=true"))
-(def file-out (file-comp "data/outbox/test.txt"))
+(def timer-end (timer "timer://foo?fixedRate=true&delay=0&period=10000" "timer"))
+(def jetty-google(jetty-endpoint "http://www.google.com"))
+(def file-google (file-comp "data\\outbox"))
 
-(def camel3 (create (route (from file-in)
+
+(def camel2 (create (route (from timer-end)
+               (to jetty-google)
+            (to file-google)
+              )))
+
+(fact "google get"  
+(start-test camel2 timer-end jetty-google file-google)
+(stop-test camel2))
+
+(def file-in (file-comp "data\\inbox\\test.txt"))
+(def file-out (file-comp "data\\outbox\\"))
+
+(def camel3 (create (route (from file-in)          
                 (to  file-out))))
 
 (fact "file test"  
-(start-test camel3 file-in file-out)
-(stop-test camel3))
+      (start-test camel3 file-in file-out)
+      (. Thread (sleep 60000))
+      (stop-test camel3))
 
 
-;from("timer://foo?fixedRate=true&delay=0&period=10000")
-;.to("http://www.google.com")
-;.setHeader(FileComponent.HEADER_FILE_NAME, "message.html").to("file:target/
-;google");
 
 
