@@ -30,7 +30,7 @@
 (JettyHttpEndpoint. (jetty-comp) url (URI. (str "jetty:" url))))
 
 (defn file-comp[file-name]
-  (FileEndpoint. (str "file:\\" file-name) (FileComponent.)))
+  (FileEndpoint. (str "file:" file-name) (FileComponent.)))
 
 (defn mock [url]
   (MockEndpoint. (str "mock:\\" url)))

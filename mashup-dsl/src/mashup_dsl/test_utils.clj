@@ -3,7 +3,6 @@
   (:use [clojure.test]
         [info.kovanovic.camelclojure.dsl]
         [ring.util.response :only [response file-response]]
-        [ring.util.response :only [response file-response]]
         [ring.middleware.reload :only [wrap-reload]]
         [ring.middleware.file :only [wrap-file]]
         [ring.middleware.stacktrace :only [wrap-stacktrace]]
@@ -75,7 +74,7 @@
     (println "run-server*" nses)
     (run-jetty
      (-> app
-         (wrap-file *webdir*)
+         (wrap-file "C:\\Users\\pvmd\\git\\mashup-dsl\\mashup-dsl\\src\\mashup_dsl\\")
          (wrap-reload nses)
          (wrap-stacktrace))
      {:port port :join? false})))

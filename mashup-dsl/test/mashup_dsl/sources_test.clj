@@ -19,11 +19,11 @@
 (start-test camel2 timer-end jetty-google file-google)
 (stop-test camel2))
 
-(def file-in (file-comp "data\\inbox\\test.txt"))
-(def file-out (file-comp "data\\outbox\\"))
+(def file-in (file-comp "C:\\datafiles\\input\\?fileName=fajl.txt"))
+(def file-out (file-comp "C:\\datafiles\\outbox\\?fileName=output.txt"))
 
 (def camel3 (create (route (from file-in)          
-                (to  file-out))))
+              (to file-out ))))
 
 (fact "file test"  
       (start-test camel3 file-in file-out)

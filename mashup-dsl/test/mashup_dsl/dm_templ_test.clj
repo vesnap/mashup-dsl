@@ -37,7 +37,7 @@
 (fact "set-test"
       (set (:data-content
           (contents-extract "title" 
-                            data-url "/search/events/event" [:title :url]))))
+                            data-url "/search/events/event" [[:title :url]]))))
 
 (fact "contents-artist"
      (first (contents-only lastfmartist

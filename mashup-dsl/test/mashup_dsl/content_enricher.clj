@@ -6,10 +6,7 @@
         [mashup-dsl.datamodel]
         [midje.sweet]
         [mashup-dsl.sources]))
-  
-        
-        
-
+ 
 (fact "content-enricher-pattern"
   (let [start (direct "normalized")
         enriched (mock "enriched")

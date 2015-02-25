@@ -9,8 +9,8 @@
 
 (def jetty (jetty-endpoint data-url))
 
-(def jetty-flights 
-  (jetty-endpoint "http://flightradar24.com/PlaneFeed.json"))
+(def jetty-events
+  (jetty-endpoint data-url))
 
 (def http-google
   (http-component ))
@@ -22,7 +22,7 @@
 (def end (mock "normalized"))
 
 (def camel (create (route (from timer-end)
-                (to jetty-flights)
+                (to jetty-events)
                 (process 
                   #(contents-extract
                      "events" data-url "/search/events/event" 
@@ -30,6 +30,6 @@
                 (to end))))
 
 (fact "normalizer pattern"  
-                         (start-test camel timer-end jetty-flights end)
+                         (start-test camel timer-end jetty-events end)
                          (is-message-count end 1)
                          (stop-test camel))

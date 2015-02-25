@@ -8,7 +8,9 @@
     [clojure.java.io :as io]
     [clojure.pprint :as pp]
     [clojure.string :as s]
-    [net.cgrand.enlive-html :as html]))
+    [net.cgrand.enlive-html :as html]
+    [clojure.data.json :as json]
+    [clojure.java.io]))
 
 ;;;;to do ;;;;
 ;;;add parsing json data
@@ -61,6 +63,11 @@
    (->> kys (map name) (interpose sep) 
         (concat (when root (list root sep))) (apply str))))
 
+(defn save-to-file[dir file-name url]
+  (with-open [wrtr (clojure.java.io/writer (str dir file-name))]
+  (.write wrtr (xml-data url))))
+
+
 (defn path
   "build a path from a collection"
   [t]
@@ -73,11 +80,12 @@
   
 (defn contents-extract [title url root-tag tags] 
   (zipmap [:data-content :title] 
-          [(vec(map(fn [item]
-                     (into {}
-                           (map (fn [tag]
-                                  [tag ($x:text (str ".//" (name tag))item)])tags)))
-                   (take 5 ($x root-tag (defxmldoc url)))))title]))
+          [ (vec (map(fn [item]
+             (into {}
+                   (map (fn [tag]
+                          [(path-key tag) ($x:text (path tag) item)])
+                        tags)))
+           (take 5 ($x root-tag (defxmldoc url))))) title]))
 
 (defn contents-only [url root-tag tags]
   (vec (map(fn [item]

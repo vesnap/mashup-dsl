@@ -73,7 +73,10 @@
 
 (def routes 
      (app
-      [""]  (fn [req] (render-request (mshp (zipmap [:data-content :title] [(create-contents ["url" "title"] "//event" data-url) "events mashup"]))))
+      [""]  (fn [req] (render-request (mshp (contents-extract "title" data-url "/search/events/event"
+                                     [[:title]
+                                      [:performers :performer :id]
+                                      [:performers :performer :name]]))))
       [&]   page-not-found))
 
 ;; ========================================
