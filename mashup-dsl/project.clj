@@ -24,6 +24,6 @@
                 [com.novemberain/monger "2.0.0"]
                 [org.clojure/data.json "0.2.5"]]
     :repositories {"local"  "C:/Users/pvmd/.m2/repository"}
-  :plugins [[lein-localrepo "0.5.2"]]
+    :plugins [[lein-localrepo "0.5.2"]]
   
 )

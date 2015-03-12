@@ -15,7 +15,8 @@
          [org.apache.camel.component.jetty JettyHttpComponent]
          [org.apache.camel.component.timer TimerComponent]
          [org.apache.camel.component.timer TimerEndpoint]
-         [java.lang Thread]))
+         [java.lang Thread]
+         [java.io File]))
 
 
 
@@ -29,8 +30,18 @@
 (defn jetty-endpoint[url]
 (JettyHttpEndpoint. (jetty-comp) url (URI. (str "jetty:" url))))
 
-(defn file-comp[file-name]
-  (FileEndpoint. (str "file:" file-name) (FileComponent.)))
+(defn file-comp []
+ (FileComponent.) )
+;camel.addComponent("file", new FileComponent());
+; Component component = camel.getComponent("file")
+;FileEndpoint endpoint = (FileEndpoint)component.createEndpoint("");
+;endpoint.setFile(new File("target/subfolder"));
+;endpoint.setAutoCreate(true);
+
+(defn file-end [file-name]
+  (
+    let [fileend (.createEndpoint "")] 
+        (.. fileend (setFile (File. file-name)) (setAutoCreate true))))
 
 (defn mock [url]
   (MockEndpoint. (str "mock:\\" url)))

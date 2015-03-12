@@ -29,6 +29,10 @@
 
 (defn data2 [url](en-html/select(en-html/xml-resource url) [:calendar]))
 
+(defn get-header [endpoint]
+  (map #(.. % getIn getHeader) (.getReceivedExchanges endpoint)))
+
+
 (defn get-received-messages [endpoint]
   (map #(.. % getIn getBody) (.getReceivedExchanges endpoint)))
 
@@ -41,12 +45,19 @@
 (defn publish [camel endpoint processor-fn]
   (.. camel createProducerTemplate (send endpoint (processor processor-fn))))
 
+(defn publish2 [camel endpoint message]
+  (.. camel createProducerTemplate (sendBodyAndHeader endpoint message "header" "header")))
+
+
 (defn send-text-message [camel endpoint message & headers]
   (publish camel endpoint (fn [[m-body m-headers]]
 			    (if-not (nil? headers)
 			      [message {(first headers)
 					(second headers)}]
 			      [message m-headers]))))
+
+(defn send-text-message2 [camel endpoint message ]
+  (publish2 camel endpoint message))
 
 (defn get-filename[fileendpoint]
   (.getDoneFileName fileendpoint))
