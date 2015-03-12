@@ -32,15 +32,10 @@
 
 (defn file-comp []
  (FileComponent.) )
-;camel.addComponent("file", new FileComponent());
-; Component component = camel.getComponent("file")
-;FileEndpoint endpoint = (FileEndpoint)component.createEndpoint("");
-;endpoint.setFile(new File("target/subfolder"));
-;endpoint.setAutoCreate(true);
+
 
 (defn file-end [file-name]
-  (
-    let [fileend (.createEndpoint "")] 
+  (  let [fileend (.createEndpoint "")] 
         (.. fileend (setFile (File. file-name)) (setAutoCreate true))))
 
 (defn mock [url]
