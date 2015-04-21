@@ -46,7 +46,8 @@
   (.. camel createProducerTemplate (send endpoint (processor processor-fn))))
 
 (defn publish2 [camel endpoint message]
-  (.. camel createProducerTemplate (sendBodyAndHeader endpoint message "header" "header")))
+  (.. camel createProducerTemplate
+   (sendBody endpoint message)))
 
 
 (defn send-text-message [camel endpoint message & headers]
@@ -56,7 +57,7 @@
 					(second headers)}]
 			      [message m-headers]))))
 
-(defn send-text-message2 [camel endpoint message ]
+(defn send-text-message2 [camel endpoint message]
   (publish2 camel endpoint message))
 
 (defn get-filename[fileendpoint]

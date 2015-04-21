@@ -15,6 +15,13 @@
          [org.apache.camel.component.jetty JettyHttpComponent]
          [org.apache.camel.component.timer TimerComponent]
          [org.apache.camel.component.timer TimerEndpoint]
+         [org.apache.camel.impl DefaultCamelContext]
+         [javax.jms ConnectionFactory]
+         [org.apache.activemq ActiveMQConnectionFactory]
+         [org.apache.camel CamelContext]
+         [org.apache.camel ProducerTemplate]
+         [org.apache.camel.builder RouteBuilder]
+         [org.apache.camel.component.jms JmsComponent]
          [java.lang Thread]
          [java.io File]))
 
@@ -31,15 +38,13 @@
 (JettyHttpEndpoint. (jetty-comp) url (URI. (str "jetty:" url))))
 
 (defn file-comp []
- (FileComponent.) )
-
+ (FileComponent. ) )
 
 (defn file-end [file-name]
-  (  let [fileend (.createEndpoint "")] 
-        (.. fileend (setFile (File. file-name)) (setAutoCreate true))))
+  (FileEndpoint. (str "file:" file-name)(file-comp)))
 
 (defn mock [url]
-  (MockEndpoint. (str "mock:\\" url)))
+  (MockEndpoint. (str "mock:/" url)))
 
 (defn directComponent []
   (DirectComponent. ))
@@ -52,4 +57,8 @@
 
 (defn set-header[name val]
   (.setHeader name val))
+;context.addComponent("test-jms", JmsComponent.jmsComponentAutoAcknowledge(connectionFactory));
 
+(defn jms-component[camel name]
+(let [con-fact (ActiveMQConnectionFactory. "vm:/localhost?broker.persistent=false")]
+  ( .addComponent camel name (.jmsComponentAutoAcknowledge JmsComponent con-fact))))
